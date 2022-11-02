@@ -18,10 +18,10 @@ func ClientSocketAPI(keyCollection *ED25519Keys) {
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		conn, _ := upgrader.Upgrade(w, r, nil)
 		defer conn.Close()
-		fmt.Printf(brightgreen+"\n[%s] [%s] +tracker\n"+white, timeStamp(), conn.RemoteAddr())
+		fmt.Printf(brightgreen+"\n[%s] [%s] +client\n"+white, timeStamp(), conn.RemoteAddr())
 		socketAuthAgent(conn, keyCollection)
 	})
 
 	// Serve via HTTP
-	http.ListenAndServe(":"+strconv.Itoa(5267), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
+	http.ListenAndServe(":"+strconv.Itoa(clientCommPort), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
 }

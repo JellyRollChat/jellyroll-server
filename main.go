@@ -16,19 +16,18 @@ func main() {
 	fmt.Println("Server Sigkey:\t" + serverKeys.signedKey[0:4] + "..  ./" + signedKeyFilePath)
 	fmt.Println("Server Cert:\t" + serverKeys.selfCert[0:4] + "..  ./" + selfCertFilePath)
 
+	announce("Sockets Up!")
+
 	// open tracker channel
-	announce("Tracker Socket Up!")
 	go TrackerSocketAPI(serverKeys)
 	fmt.Println("Tracker Port:\t" + strconv.Itoa(trackerCommPort))
 
 	// open server channel
-	announce("Server Socket Up!")
-	go TrackerSocketAPI(serverKeys)
+	go ServerSocketAPI(serverKeys)
 	fmt.Println("Server Port:\t" + strconv.Itoa(serverCommPort))
 
 	// open client channel
-	announce("Client Socket Up!")
-	go TrackerSocketAPI(serverKeys)
+	go ClientSocketAPI(serverKeys)
 	fmt.Println("Client Port:\t" + strconv.Itoa(clientCommPort))
 
 	// blocking operation

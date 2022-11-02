@@ -23,5 +23,5 @@ func TrackerSocketAPI(keyCollection *ED25519Keys) {
 	})
 
 	// Serve via HTTP
-	http.ListenAndServe(":"+strconv.Itoa(5269), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
+	http.ListenAndServe(":"+strconv.Itoa(trackerCommPort), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
 }
