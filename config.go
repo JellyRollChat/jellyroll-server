@@ -1,6 +1,9 @@
 package main
 
-import "github.com/gorilla/websocket"
+import (
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/websocket"
+)
 
 const (
 	trackerCommPort = 5269
@@ -15,6 +18,32 @@ const (
 
 var serverKeys *ED25519Keys
 
+var (
+	corsAllowedHeaders = []string{
+		"Access-Control-Allow-Headers",
+		"Access-Control-Allow-Methods",
+		"Access-Control-Allow-Origin",
+		"Cache-Control",
+		"Content-Security-Policy",
+		"Feature-Policy",
+		"Referrer-Policy",
+		"X-Requested-With"}
+
+	corsOrigins = []string{
+		// "*",
+		"127.0.0.1"}
+
+	corsMethods = []string{
+		"GET",
+		"HEAD",
+		"POST",
+		"PUT",
+		"OPTIONS"}
+
+	headersCORS = handlers.AllowedHeaders(corsAllowedHeaders)
+	originsCORS = handlers.AllowedOrigins(corsOrigins)
+	methodsCORS = handlers.AllowedMethods(corsMethods)
+)
 var (
 	nc = ""
 
@@ -38,9 +67,6 @@ var (
 )
 
 var (
-	dbUser          string = "postgres"
-	dbName          string = "karai"
-	dbSSL           string = "disable"
 	joinMsg         []byte = []byte("JOIN")
 	ncasMsg         []byte = []byte("NCAS")
 	capkMsg         []byte = []byte("CAPK")
@@ -52,11 +78,10 @@ var (
 	rtrnMsg         []byte = []byte("RTRN")
 	numTx           int
 	wantsClean      bool = false
-	karaiAPIPort    int
-	serverPubkey    = ""
-	serverPrivkey   = ""
-	serverSignedkey = ""
-	upgrader        = websocket.Upgrader{
+	serverPubkey         = ""
+	serverPrivkey        = ""
+	serverSignedkey      = ""
+	upgrader             = websocket.Upgrader{
 		EnableCompression: true,
 		ReadBufferSize:    1024,
 		WriteBufferSize:   1024,

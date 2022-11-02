@@ -20,7 +20,7 @@ func main() {
 
 	announce("Socket API up!")
 
-	go SocketAPI(serverKeys)
+	go TrackerSocketAPI(serverKeys)
 
 	fmt.Println("Tracker Port:\t" + strconv.Itoa(trackerCommPort))
 	fmt.Println("Server Port:\t" + strconv.Itoa(serverCommPort))

@@ -34,6 +34,7 @@ func socketAuthAgent(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 			trimmedPubKey := strings.TrimLeft(trimNewlinePrefix, "JOIN ")
 
+			// complains about loop duration
 			regValidate, _ := regexp.MatchString(`[a-f0-9]{64}`, trimmedPubKey[:64])
 			if !regValidate {
 				fmt.Printf("\nContains illegal characters")
