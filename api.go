@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -22,7 +23,7 @@ func SocketAPI(keyCollection *ED25519Keys) {
 		"X-Requested-With"}
 
 	corsOrigins := []string{
-		"*",
+		// "*",
 		"127.0.0.1"}
 
 	corsMethods := []string{
@@ -37,15 +38,15 @@ func SocketAPI(keyCollection *ED25519Keys) {
 	methodsCORS := handlers.AllowedMethods(corsMethods)
 
 	// Init API
-	r := mux.NewRouter()
-	api := r.PathPrefix("/api/v1").Subrouter()
+	api := mux.NewRouter()
+	// api := r.PathPrefix("/api/v1").Subrouter()
 
 	// Channel Socket
 	api.HandleFunc("/channel", func(w http.ResponseWriter, r *http.Request) {
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		conn, _ := upgrader.Upgrade(w, r, nil)
 		defer conn.Close()
-		// fmt.Printf(brightgreen+"\n[%s] [%s] Peer socket opened!"+white, timeStamp(), conn.RemoteAddr())
+		fmt.Printf(brightgreen+"\n[%s] [%s] +Peer\n"+white, timeStamp(), conn.RemoteAddr())
 		socketAuthAgent(conn, keyCollection)
 	})
 
