@@ -23,5 +23,5 @@ func ServerSocketAPI(keyCollection *ED25519Keys) {
 	})
 
 	// Serve via HTTP
-	http.ListenAndServe(":"+strconv.Itoa(5268), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
+	http.ListenAndServe(":"+strconv.Itoa(serverCommPort), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
 }
