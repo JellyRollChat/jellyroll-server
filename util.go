@@ -111,33 +111,3 @@ func init() {
 	serverKeys = initKeys()
 
 }
-
-// func whoopsInitKeys() {
-
-// if !fileExists(pubKeyFilePath) {
-
-// 	fmt.Println("Welcome! It looks like you don't have keys yet. We'll attempt to generate some now.")
-// 	theseKeys := generateKeys()
-
-// 	fmt.Println("Writing public key: " + pubKeyFilePath)
-// 	writeFile(pubKeyFilePath, theseKeys.publicKey)
-
-// 	fmt.Println("Writing private key: " + privKeyFilePath)
-// 	writeFile(privKeyFilePath, theseKeys.privateKey)
-
-// 	fmt.Println("Writing signed key: " + signedKeyFilePath)
-// 	writeFile(signedKeyFilePath, theseKeys.signedKey)
-
-// } else if fileExists(pubKeyFilePath) {
-
-// 	fmt.Println("Reading public key: " + pubKeyFilePath)
-// 	serverPubkey = readFile(pubKeyFilePath)
-
-// 	fmt.Println("Reading private key: " + privKeyFilePath)
-// 	serverPrivkey = readFile(privKeyFilePath)
-
-// 	fmt.Println("Reading signed key: " + signedKeyFilePath)
-// 	serverSignedkey = readFile(signedKeyFilePath)
-
-// }
-// }

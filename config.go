@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/websocket"
 )
@@ -45,6 +47,10 @@ var (
 	originsCORS = handlers.AllowedOrigins(corsOrigins)
 	methodsCORS = handlers.AllowedMethods(corsMethods)
 )
+
+var (
+	trackerPingLimit = 60 * time.Second
+)
 var (
 	nc = ""
 
@@ -72,7 +78,8 @@ var (
 	ncasMsg         []byte = []byte("NCAS")
 	capkMsg         []byte = []byte("CAPK")
 	certMsg         []byte = []byte("CERT")
-	peerMsg         []byte = []byte("PEER")
+	pingMsg         []byte = []byte("PING")
+	pongMsg         []byte = []byte("PONG")
 	pubkMsg         []byte = []byte("PUBK")
 	nsigMsg         []byte = []byte("NSIG")
 	sendMsg         []byte = []byte("SEND")

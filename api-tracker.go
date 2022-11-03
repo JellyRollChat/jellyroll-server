@@ -16,7 +16,7 @@ func TrackerSocketAPI(keyCollection *ED25519Keys) {
 	api := mux.NewRouter()
 
 	// Channel Socket
-	api.HandleFunc("/channel", func(w http.ResponseWriter, r *http.Request) {
+	api.HandleFunc("/channel/tracker", func(w http.ResponseWriter, r *http.Request) {
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		conn, _ := upgrader.Upgrade(w, r, nil)
 		defer conn.Close()
@@ -30,12 +30,14 @@ func TrackerSocketAPI(keyCollection *ED25519Keys) {
 
 func socketTrackerParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
+	// Start reading messages in a loop
 	for {
 
+		// When we're done close the connection.
 		defer conn.Close()
 
+		// Try to read the message, if there's an error, shit the bed.
 		msgType, msg, err := conn.ReadMessage()
-
 		if err != nil {
 
 			// socket session closed
@@ -44,8 +46,15 @@ func socketTrackerParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			return
 		}
 
-		if bytes.HasPrefix(msg, peerMsg) {
-			conn.WriteMessage(msgType, []byte(keyCollection.publicKey))
+		// If we recognize this message as a tracker ping, run this.
+		if bytes.HasPrefix(msg, pingMsg) {
+
+			// reply to PING with PONG
+			conn.WriteMessage(msgType, pongMsg)
+
+			// print status message
+			fmt.Printf(nc+"\n[%s] [%s] PING!\n"+white, timeStamp(), conn.RemoteAddr())
+
 		}
 
 	}

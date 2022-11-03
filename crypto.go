@@ -4,10 +4,9 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 
-	"golang.org/x/crypto/ed25519"
+	"crypto/ed25519"
 )
 
-// ED25519Keys This is a struct for holding keys and a signature.
 type ED25519Keys struct {
 	publicKey  string
 	privateKey string
@@ -53,20 +52,20 @@ func generateKeys() *ED25519Keys {
 	return &keys
 }
 
-// func sign(myKeys *ED25519Keys, msg string) string {
-// 	messageBytes := []byte(msg)
-// 	privateKey, err := hex.DecodeString(myKeys.privateKey)
-// 	if err != nil {
-// 		handle("private key error: ", err)
-// 	}
-// 	publicKey, err := hex.DecodeString(myKeys.publicKey)
-// 	if err != nil {
-// 		handle("public key error: ", err)
-// 	}
-// 	privateKey = append(privateKey, publicKey...)
-// 	signature := ed25519.Sign(privateKey, messageBytes)
-// 	return hex.EncodeToString(signature)
-// }
+func signMsg(myKeys *ED25519Keys, msg string) string {
+	messageBytes := []byte(msg)
+	privateKey, err := hex.DecodeString(myKeys.privateKey)
+	if err != nil {
+		handle("private key error: ", err)
+	}
+	publicKey, err := hex.DecodeString(myKeys.publicKey)
+	if err != nil {
+		handle("public key error: ", err)
+	}
+	privateKey = append(privateKey, publicKey...)
+	signature := ed25519.Sign(privateKey, messageBytes)
+	return hex.EncodeToString(signature)
+}
 
 func signKey(myKeys *ED25519Keys, publicKey string) string {
 	messageBytes, err := hex.DecodeString(publicKey)
