@@ -16,6 +16,7 @@ func httpTrackerAPI(keyCollection *ED25519Keys) {
 	api.HandleFunc("/ping/", trackerPingHandler).Methods(http.MethodGet)
 
 	// Server Federation Socket
+	// This is for servers passing messages from server to server
 	api.HandleFunc("/channel/server", func(w http.ResponseWriter, r *http.Request) {
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		conn, _ := upgrader.Upgrade(w, r, nil)
@@ -24,13 +25,14 @@ func httpTrackerAPI(keyCollection *ED25519Keys) {
 		socketServerParser(conn, keyCollection)
 	})
 
-	// Channel Socket
+	// User Communication Socket
+	// This is for clients sending messages through the server
 	api.HandleFunc("/channel/client", func(w http.ResponseWriter, r *http.Request) {
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		conn, _ := upgrader.Upgrade(w, r, nil)
 		defer conn.Close()
 		fmt.Printf(brightgreen+"\n[%s] [%s] +client\n"+white, timeStamp(), conn.RemoteAddr())
-		socketServerParser(conn, keyCollection)
+		socketClientParser(conn, keyCollection)
 	})
 
 	// Serve via HTTP
