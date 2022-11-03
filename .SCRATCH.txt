@@ -1,0 +1,31 @@
+ok so where im leaving off right now is cleaving off the key creation stuff on the server side. britt was busting my balls about how hes gonna ddos it so fuck it, users create their own keys, and can verify sigs with the server.
+
+where we're at now is we need a way to first get the server to relay a message from user to user.
+
+then we need sign a message 
+
+then the other side needs to verify incoming messages 
+
+read a list of pubkeys as a buddy list 
+- add aliases as k:v ?
+
+
+client:receive
+- receive message from server
+- sender in buddylist?
+  if yes, verify sig
+  if no, disconnect
+
+client:send 
+- sign message 
+- send message to server
+
+
+server:receive 
+- receive first message from user 
+- sender in userlist?
+  if yes, verify cert
+    if cert good, continue connection 
+    if cert bad, disconnect 
+  if no, enlist user 
+  
