@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	webPort         = 5270
 	trackerCommPort = 5269
 	serverCommPort  = 5268
 	clientCommPort  = 5267

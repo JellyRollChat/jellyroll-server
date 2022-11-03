@@ -30,6 +30,10 @@ func main() {
 	go ClientSocketAPI(serverKeys)
 	fmt.Println("Client Port:\t" + strconv.Itoa(clientCommPort))
 
+	announce("Web Frontend Up!")
+	go serverWebAPI()
+	fmt.Println("Web Port:\t" + strconv.Itoa(webPort))
+
 	// blocking operation
 	select {}
 }
