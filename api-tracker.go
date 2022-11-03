@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -46,40 +44,6 @@ func socketTrackerParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			return
 		}
 
-		// if the socket has a join message
-		if bytes.HasPrefix(msg, joinMsg) {
-
-			msgToString := string(msg)
-
-			trimNewlinePrefix := strings.TrimRight(msgToString, "\n")
-
-			trimmedPubKey := strings.TrimLeft(trimNewlinePrefix, "JOIN ")
-
-			// complains about loop duration
-			regValidate, _ := regexp.MatchString(`[a-f0-9]{64}`, trimmedPubKey[:64])
-			if !regValidate {
-				fmt.Printf("\nContains illegal characters")
-				conn.Close()
-				return
-			}
-
-		}
-		if bytes.HasPrefix(msg, rtrnMsg) {
-			fmt.Printf("\nreturn message: %s", string(msg))
-
-			input := strings.TrimLeft(string(msg), "RTRN ")
-			var cert = strings.Split(input, " ")
-
-			if !verifySignature(cert[0], keyCollection.publicKey, cert[1]) {
-				fmt.Printf("\nsig doesnt verify")
-			}
-			if verifySignature(cert[0], keyCollection.publicKey, cert[1]) {
-				fmt.Printf("\nsig verifies")
-			}
-		}
-		if bytes.HasPrefix(msg, pubkMsg) {
-			conn.WriteMessage(msgType, []byte(keyCollection.publicKey))
-		}
 		if bytes.HasPrefix(msg, peerMsg) {
 			conn.WriteMessage(msgType, []byte(keyCollection.publicKey))
 		}
