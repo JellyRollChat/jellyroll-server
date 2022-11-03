@@ -18,8 +18,8 @@ func main() {
 
 	announce("Sockets Up!")
 
-	// open tracker channel
-	go TrackerSocketAPI(serverKeys)
+	// run tracker API
+	go httpTrackerAPI(serverKeys)
 	fmt.Println("Tracker Port:\t" + strconv.Itoa(trackerCommPort))
 
 	// open server channel
