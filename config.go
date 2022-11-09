@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/websocket"
 )
@@ -51,47 +49,30 @@ var (
 )
 
 var (
-	trackerPingLimit = 60 * time.Second
-)
-var (
 	nc = ""
 
-	brightblack   = ""
-	brightred     = ""
-	brightgreen   = ""
-	brightyellow  = ""
-	brightpurple  = ""
-	brightmagenta = ""
-	brightcyan    = ""
-	brightwhite   = ""
+	// brightblack   = ""
+	brightred    = ""
+	brightgreen  = ""
+	brightyellow = ""
+	// brightpurple  = ""
+	// brightmagenta = ""
+	brightcyan = ""
+	// brightwhite   = ""
 
-	black   = ""
-	red     = ""
-	green   = ""
-	yellow  = ""
-	purple  = ""
-	magenta = ""
-	cyan    = ""
-	white   = ""
+	// black   = ""
+	// red     = ""
+	green = ""
+	// yellow  = ""
+	// purple  = ""
+	// magenta = ""
+	// cyan    = ""
+	white = ""
 )
 
 var (
-	joinMsg         []byte = []byte("JOIN")
-	ncasMsg         []byte = []byte("NCAS")
-	capkMsg         []byte = []byte("CAPK")
-	certMsg         []byte = []byte("CERT")
-	pingMsg         []byte = []byte("PING")
-	pongMsg         []byte = []byte("PONG")
-	pubkMsg         []byte = []byte("PUBK")
-	nsigMsg         []byte = []byte("NSIG")
-	sendMsg         []byte = []byte("SEND")
-	rtrnMsg         []byte = []byte("RTRN")
-	numTx           int
-	wantsClean      bool = false
-	serverPubkey         = ""
-	serverPrivkey        = ""
-	serverSignedkey      = ""
-	upgrader             = websocket.Upgrader{
+	pingMsg  []byte = []byte("PING")
+	upgrader        = websocket.Upgrader{
 		EnableCompression: true,
 		ReadBufferSize:    1024,
 		WriteBufferSize:   1024,

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"strconv"
@@ -29,7 +28,7 @@ func fileExists(filename string) bool {
 
 // fileContainsString This is a utility to see if a string in a file exists.
 func fileContainsString(str, filepath string) bool {
-	accused, _ := ioutil.ReadFile(filepath)
+	accused, _ := os.ReadFile(filepath)
 	isExist, _ := regexp.Match(str, accused)
 	return isExist
 }
@@ -77,6 +76,7 @@ func writeFile(filename, textToWrite string) {
 	handle("", err)
 	defer file.Close()
 	_, err = file.WriteString(textToWrite)
+	handle("error writing file: ", err)
 	err = file.Sync()
 	handle("", err)
 }
@@ -87,19 +87,21 @@ func writeFileBytes(filename string, bytesToWrite []byte) {
 	handle("", err)
 	defer file.Close()
 	_, err = file.Write(bytesToWrite)
+	handle("error writing file bytes: ", err)
+
 	err = file.Sync()
 	handle("", err)
 }
 
 // readFile Generic file handler
 func readFile(filename string) string {
-	text, err := ioutil.ReadFile(filename)
+	text, err := os.ReadFile(filename)
 	handle("Couldnt read the file: ", err)
 	return string(text)
 }
 
 func readFileBytes(filename string) []byte {
-	text, err := ioutil.ReadFile(filename)
+	text, err := os.ReadFile(filename)
 	handle("Couldnt read the file: ", err)
 	return text
 }
