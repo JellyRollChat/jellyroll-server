@@ -12,7 +12,7 @@ func osCheck() {
 		brightgreen = "\033[1;32m"
 		brightyellow = "\033[1;33m"
 		// brightpurple = "\033[1;34m"
-		// brightmagenta = "\033[1;35m"
+		brightmagenta = "\033[1;35m"
 		brightcyan = "\033[1;36m"
 		// brightwhite = "\033[1;37m"
 
@@ -20,9 +20,9 @@ func osCheck() {
 		// red = "\033[0;31m"
 		green = "\033[0;32m"
 		// yellow = "\033[0;33m"
-		// purple = "\033[0;34m"
-		// magenta = "\033[0;35m"
-		// cyan = "\033[0;36m"
+		purple = "\033[0;34m"
+		magenta = "\033[0;35m"
+		cyan = "\033[0;36m"
 		white = "\033[0;37m"
 
 	}

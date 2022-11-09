@@ -67,6 +67,24 @@ func createFile(filename string) {
 	}
 }
 
+func appendFile(filename, textToWrite string) {
+	// If the file doesn't exist, create it, or append to the file
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		handle("error opening file to append: ", err)
+
+	}
+	if _, err := f.WriteString(textToWrite); err != nil {
+		handle("error appending to file: ", err)
+
+	}
+	if err := f.Close(); err != nil {
+		handle("error closing file after appending: ", err)
+
+	}
+
+}
+
 // writeFile Generic file handler
 func writeFile(filename, textToWrite string) {
 	if !fileExists(filename) {

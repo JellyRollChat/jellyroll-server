@@ -20,46 +20,38 @@ func serverWebAPI() {
 	api.HandleFunc("/signup", SignupHandlerPOST).Methods(http.MethodPost)
 	api.HandleFunc("/signup/", SignupHandlerPOST).Methods(http.MethodPost)
 
-	// Serve via HTTP
 	http.ListenAndServe(":"+strconv.Itoa(webPort), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
 }
 
 func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 	userAgent := r.UserAgent()
-	fmt.Printf(brightgreen+"\n/%s"+white+" by "+brightcyan+"%s\n"+white+"Agent: "+brightcyan+"%s\n"+nc, name, r.RemoteAddr, userAgent)
+	fmt.Printf("\n"+purple+r.Method+" "+brightgreen+"/%s"+white+" by "+brightcyan+"%s\n"+white+"Agent: "+cyan+"%s\n"+nc, name, r.RemoteAddr, userAgent)
 }
 
 func SignupHandlerGET(w http.ResponseWriter, r *http.Request) {
-
+	reportRequest("signup", w, r)
 	files := []string{
 		"templates/signup.html",
 	}
 
-	// Parse the file list
 	t, parseSignupFiles := template.ParseFiles(files...)
 
-	// if something goes wrong, report it, and where
-	// the error was generated.
 	handle("", parseSignupFiles)
 	if parseSignupFiles != nil {
 
-		// if something went wrong, browsers should be relayed a
-		// an Internal Server Error status.
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 
-		// stop execution
 		return
 	}
 
-	// if we did everything right, this should serve the request.
 	whatswrong := t.Execute(w, r)
 	handle("http signup render error", whatswrong)
 
 }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
+	reportRequest("signup", w, r)
 
-	log.Println("hittin post")
 	type signupObject struct {
 		username   string
 		password   string
@@ -111,12 +103,13 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// now that the things that need to be plaintext are done, hash it
 		thisSignup.password = hashit(thisSignup.password)
 
-		writeFile("admin/users.list", thisSignup.username+"::"+thisSignup.password)
+		appendFile("admin/users.list", thisSignup.username+"::"+thisSignup.password+"\n")
 
-		fmt.Fprintf(w, "Success! You can now use your username and password to login. \n\nUsername: %s\nServer: %s", thisSignup.username, servertld)
+		fmt.Fprintf(w, "Success! You can now use your username and password to login. \n\nUsername: %s\nServer: %s\n\nGive your friends this address: %s\n\nTip: It looks like an email but it's really your full username.", thisSignup.username, servertld, thisSignup.username+"@"+servertld)
+
+		log.Println(brightmagenta + "New User: " + magenta + thisSignup.username + "@" + servertld)
 		return
 
 	} else {

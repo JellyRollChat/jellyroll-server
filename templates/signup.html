@@ -2,6 +2,13 @@
   <head>
     <title>chat signup</title>
     <style>
+      body {
+        margin-left: 1em;
+        margin-right: 1em;
+      }
+      h1 {
+        margin-top: 1em;
+      }
       * {
         font-family: sans-serif;
       }
@@ -15,20 +22,27 @@
         padding: 1em;
         margin-top: 1em;
       }
+      small {
+        opacity: 0.5;
+      }
     </style>
   </head>
   <body>
-    <h1>signup</h1>
-    <p>Choose a username and password</p>
+    <h1>welcome :)</h1>
+    <p>Choose a username and password, then click submit to signup.</p>
+    <form action="/signup" method="POST">
     <p>
       <label for="signupUsername">Username</label> <br>
+      <small>6-20 characters, no symbols </small> <br>
       <input type="text" id="signupUsername" name="signupUsername" required />
     </p>
     <p>
       <label for="signupPassword">Password (twice)</label> <br>
+      <small>At least 8 characters </small> <br>
       <input type="password" name="signupPassword" id="signupPassword" required /> 
       <input type="password" name="signupPasswordRepeat" id="signupPasswordRepeat" required /> 
     </p>
-    <input type="submit" value="Submit" method="POST" action="/signup">
+    <input type="submit" value="Submit">
+  </form>
   </body>
 </html>

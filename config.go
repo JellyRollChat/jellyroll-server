@@ -56,18 +56,18 @@ var (
 	brightgreen  = ""
 	brightyellow = ""
 	// brightpurple  = ""
-	// brightmagenta = ""
-	brightcyan = ""
+	brightmagenta = ""
+	brightcyan    = ""
 	// brightwhite   = ""
 
 	// black   = ""
 	// red     = ""
 	green = ""
 	// yellow  = ""
-	// purple  = ""
-	// magenta = ""
-	// cyan    = ""
-	white = ""
+	purple  = ""
+	magenta = ""
+	cyan    = ""
+	white   = ""
 )
 
 var (
