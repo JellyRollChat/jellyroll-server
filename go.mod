@@ -9,4 +9,7 @@ require (
 	golang.org/x/crypto v0.1.0
 )
 
-require github.com/felixge/httpsnoop v1.0.1 // indirect
+require (
+	github.com/felixge/httpsnoop v1.0.1 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+)
