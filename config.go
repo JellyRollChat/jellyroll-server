@@ -13,6 +13,8 @@ const (
 	serverCommPort  = 5268
 	clientCommPort  = 5267
 
+	servertld = "server.3ck0.com"
+
 	pubKeyFilePath    = "keys/" + "public.key"
 	privKeyFilePath   = "keys/" + "private.key"
 	signedKeyFilePath = "keys/" + "signed.key"

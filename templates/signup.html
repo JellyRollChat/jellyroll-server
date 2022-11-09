@@ -12,7 +12,7 @@
       input[type=text],
       input[type=password],
       input[type=submit] {
-        padding: 1em 2em;
+        padding: 1em;
         margin-top: 1em;
       }
     </style>
@@ -22,13 +22,13 @@
     <p>Choose a username and password</p>
     <p>
       <label for="signupUsername">Username</label> <br>
-      <input type="text" id="signupUsername" required />
+      <input type="text" id="signupUsername" name="signupUsername" required />
     </p>
     <p>
       <label for="signupPassword">Password (twice)</label> <br>
-      <input type="password" id="signupPassword" required /> 
-      <input type="password" id="signupPasswordRepeat" required /> 
+      <input type="password" name="signupPassword" id="signupPassword" required /> 
+      <input type="password" name="signupPasswordRepeat" id="signupPasswordRepeat" required /> 
     </p>
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" method="POST" action="/signup">
   </body>
 </html>

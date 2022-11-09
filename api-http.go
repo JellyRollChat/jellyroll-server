@@ -17,8 +17,8 @@ func serverWebAPI() {
 	api := mux.NewRouter()
 	api.HandleFunc("/signup", SignupHandlerGET).Methods(http.MethodGet)
 	api.HandleFunc("/signup/", SignupHandlerGET).Methods(http.MethodGet)
-	api.HandleFunc("/signup", SignupHandlerGET).Methods(http.MethodPost)
-	api.HandleFunc("/signup/", SignupHandlerGET).Methods(http.MethodPost)
+	api.HandleFunc("/signup", SignupHandlerPOST).Methods(http.MethodPost)
+	api.HandleFunc("/signup/", SignupHandlerPOST).Methods(http.MethodPost)
 
 	// Serve via HTTP
 	http.ListenAndServe(":"+strconv.Itoa(webPort), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
@@ -59,6 +59,7 @@ func SignupHandlerGET(w http.ResponseWriter, r *http.Request) {
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 
+	log.Println("hittin post")
 	type signupObject struct {
 		username   string
 		password   string
@@ -70,13 +71,11 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	for key, value := range r.Form {
 		if key == "signupUsername" {
-			thisSignup.username = value[0]
+			thisSignup.username = sanitizeString(value[0], 20)
 		} else if key == "signupPassword" {
 			thisSignup.password = value[0]
 		} else if key == "signupPasswordRepeat" {
 			thisSignup.passRepeat = value[0]
-		} else {
-			log.Println("login form key: " + key + "\nlogin form value: " + strings.Join(value, ", "))
 		}
 	}
 
@@ -112,7 +111,13 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		writeFile("admin/users.list", thisSignup.username+"::"+hashit(thisSignup.password))
+		// now that the things that need to be plaintext are done, hash it
+		thisSignup.password = hashit(thisSignup.password)
+
+		writeFile("admin/users.list", thisSignup.username+"::"+thisSignup.password)
+
+		fmt.Fprintf(w, "Success! You can now use your username and password to login. \n\nUsername: %s\nServer: %s", thisSignup.username, servertld)
+		return
 
 	} else {
 		log.Println(brightred + "Username is not available " + nc)

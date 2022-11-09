@@ -10,6 +10,14 @@ import (
 	"time"
 )
 
+func sanitizeString(dirtyString string, maxlen int) string {
+	var re = regexp.MustCompile(`(?i)[^a-z0-9_\.]`)
+	if len(re.ReplaceAllString(dirtyString, "")) > maxlen {
+		return re.ReplaceAllString(dirtyString, "")[:maxlen]
+	}
+	return re.ReplaceAllString(dirtyString, "")
+}
+
 // fileExists Does this file exist?
 func fileExists(filename string) bool {
 	referencedFile, err := os.Stat(filename)
