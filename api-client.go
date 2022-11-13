@@ -34,7 +34,7 @@ func socketClientParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 		defer conn.Close()
 
-		msgType, msg, err := conn.ReadMessage()
+		_, msg, err := conn.ReadMessage()
 
 		if err != nil {
 
