@@ -48,7 +48,7 @@ func socketClientParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			// socket session closed
 			fmt.Printf(brightyellow+"\n[%s] [%s] Peer disconnected\n"+white, timeStamp(), conn.RemoteAddr())
 
-			return
+			break
 		}
 
 		if bytes.HasPrefix(msg, pingMsg) {
