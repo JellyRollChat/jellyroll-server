@@ -44,7 +44,7 @@ func SignupHandlerGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	whatswrong := t.Execute(w, r)
+	whatswrong := t.Execute(w, servertld)
 	handle("http signup render error", whatswrong)
 
 }
@@ -107,10 +107,37 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 
 		appendFile("admin/users.list", thisSignup.username+"::"+thisSignup.password+"\n")
 
-		fmt.Fprintf(w, "Success! You can now use your username and password to login. \n\nUsername: %s\nServer: %s\n\nGive your friends this address: %s\n\nTip: It looks like an email but it's really your full username.", thisSignup.username, servertld, thisSignup.username+"@"+servertld)
+		files := []string{
+			"templates/signupSuccess.html",
+		}
+
+		t, parseSignupFiles := template.ParseFiles(files...)
+
+		handle("error parsing signupsuccess view: ", parseSignupFiles)
+		if parseSignupFiles != nil {
+
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+
+			return
+		}
+
+		type userInfo struct {
+			Username  string
+			Servertld string
+		}
+
+		thisUser := userInfo{}
+
+		thisUser.Servertld = servertld
+		thisUser.Username = thisSignup.username
+
+		whatswrong := t.Execute(w, thisUser)
+		handle("http signup success render error", whatswrong)
+
+		// fmt.Fprintf(w, "Success! You can now use your username and password to login. \n\nUsername: %s\nServer: %s\n\nGive your friends this address: %s\n\nTip: It looks like an email but it's really your full username.", thisSignup.username, servertld, thisSignup.username+"@"+servertld)
 
 		log.Println(brightmagenta + "New User: " + magenta + thisSignup.username + "@" + servertld)
-		return
+		// return
 
 	} else {
 		log.Println(brightred + "Username is not available " + nc)

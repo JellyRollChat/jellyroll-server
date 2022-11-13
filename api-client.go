@@ -45,7 +45,7 @@ func socketClientParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 		}
 
 		if bytes.HasPrefix(msg, pingMsg) {
-			conn.WriteMessage(msgType, []byte(keyCollection.publicKey))
+			conn.PingHandler()
 		}
 
 	}
