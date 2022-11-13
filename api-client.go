@@ -16,7 +16,14 @@ func ClientSocketAPI(keyCollection *ED25519Keys) {
 	api := mux.NewRouter()
 
 	// Channel Socket
-	api.HandleFunc("/channel", func(w http.ResponseWriter, r *http.Request) {
+	api.HandleFunc("/channel/client", func(w http.ResponseWriter, r *http.Request) {
+		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+		conn, _ := upgrader.Upgrade(w, r, nil)
+		defer conn.Close()
+		fmt.Printf(brightgreen+"\n[%s] [%s] +client\n"+white, timeStamp(), conn.RemoteAddr())
+		socketClientParser(conn, keyCollection)
+	})
+	api.HandleFunc("/channel/client/", func(w http.ResponseWriter, r *http.Request) {
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		conn, _ := upgrader.Upgrade(w, r, nil)
 		defer conn.Close()
@@ -45,7 +52,7 @@ func socketClientParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 		}
 
 		if bytes.HasPrefix(msg, pingMsg) {
-			conn.PingHandler()
+			conn.WriteMessage(1, []byte("PONG"))
 		}
 
 	}
