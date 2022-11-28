@@ -133,9 +133,3 @@ func deleteFile(filename string) {
 func validJSON(stringToValidate string) bool {
 	return json.Valid([]byte(stringToValidate))
 }
-
-func init() {
-	osCheck()
-	serverKeys = initKeys()
-
-}

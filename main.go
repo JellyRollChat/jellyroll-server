@@ -10,6 +10,10 @@ func main() {
 	announce("Server up!")
 
 	createDirIfItDontExist("keys")
+	createDirIfItDontExist("admin")
+
+	osCheck()
+	serverKeys = initKeys()
 
 	fmt.Println("Server Pubkey:\t" + serverKeys.publicKey[0:4] + "..  ./" + pubKeyFilePath)
 	fmt.Println("Server Privkey:\t" + serverKeys.privateKey[0:4] + "..  ./" + privKeyFilePath)
