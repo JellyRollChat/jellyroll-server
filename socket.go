@@ -47,7 +47,7 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 		msgType := 1
 
 		if bytes.HasPrefix(msg, pingMsg) {
-			conn.WriteMessage(msgType, []byte(keyCollection.publicKey))
+			conn.WriteMessage(msgType, []byte(pingMsg))
 		} else if bytes.HasPrefix(msg, infoMsg) {
 			fmt.Println("Full User ID:")
 			fullnameb := hex.EncodeToString([]byte("username@server.tld"))
