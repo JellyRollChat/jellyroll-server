@@ -61,9 +61,9 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			fmt.Println("Full Message: ")
 			fullmesgb := "<:" + fullnameb + "," + bodyb + ":>"
 			fmt.Println(fullmesgb)
-			conn.WriteMessage(msgType, []byte(fullmesgb))
+			// conn.WriteMessage(msgType, []byte(fullmesgb))
 
-			// thisDecodedMesg, _ := hex.DecodeString(fullmesgb)
+			thisDecodedMesg, _ := hex.DecodeString(fullmesgb)
 
 			conn.WriteMessage(msgType, thisDecodedMesg)
 		} else if bytes.HasPrefix(msg, rglrMsg) {
