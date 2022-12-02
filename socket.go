@@ -70,7 +70,7 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 			msgStr := string(msg)
 
-			trimLCarrot := strings.TrimLeft(msgStr, "<^_-:")
+			trimLCarrot := strings.TrimLeft(msgStr, "TEST <^_-:")
 			trimRCarrot := strings.TrimRight(trimLCarrot, ":-_^>")
 			splitUsrMsg := strings.Split(trimRCarrot, "<._o>")
 
