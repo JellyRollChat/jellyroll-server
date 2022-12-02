@@ -59,7 +59,7 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			bodyb := hex.EncodeToString([]byte("This is a test message!"))
 			fmt.Println(bodyb)
 			fmt.Println("Full Message: ")
-			fullmesgb := "<^_-:" + fullnameb + "<._o>" + bodyb + ":-_^>"
+			fullmesgb := "<:" + fullnameb + "->" + bodyb + ":>"
 			fmt.Println(fullmesgb)
 			conn.WriteMessage(msgType, []byte(fullmesgb))
 
@@ -70,9 +70,9 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 			msgStr := string(msg)
 
-			trimLCarrot := strings.TrimLeft(msgStr, "TEST <^_-:")
-			trimRCarrot := strings.TrimRight(trimLCarrot, ":-_^>")
-			splitUsrMsg := strings.Split(trimRCarrot, "<._o>")
+			trimLCarrot := strings.TrimLeft(msgStr, "TEST <:")
+			trimRCarrot := strings.TrimRight(trimLCarrot, ":>")
+			splitUsrMsg := strings.Split(trimRCarrot, "->")
 
 			fmt.Println("Full User ID:")
 			fmt.Println("Encoded: ", splitUsrMsg[0])
@@ -101,7 +101,7 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 				fmt.Println("Decoded string: ", string(decodedBody))
 			}
 
-			thisDecodedMesg := "<^_-:" + string(decodedUserName) + "<._o>" + string(decodedBody) + ":-_^>"
+			thisDecodedMesg := "<:" + string(decodedUserName) + "->" + string(decodedBody) + ":>"
 
 			conn.WriteMessage(msgType, []byte(thisDecodedMesg))
 		}
