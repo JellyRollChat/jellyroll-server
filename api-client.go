@@ -11,9 +11,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type CommPacket struct {
-	
-}
 func ClientSocketAPI(keyCollection *ED25519Keys) {
 
 	api := mux.NewRouter()
@@ -49,6 +46,8 @@ func socketClientParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 		if bytes.HasPrefix(msg, pingMsg) {
 			conn.WriteMessage(1, []byte("PONG"))
+		} else {
+			conn.WriteMessage(2, msg)
 		}
 
 	}

@@ -1,3 +1,1 @@
-module cli
-
-go 1.19
+module cligo 1.19
