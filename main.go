@@ -22,17 +22,17 @@ func main() {
 
 	announce("Sockets Up!")
 
-	// run tracker API
-	go httpTrackerAPI(serverKeys)
-	fmt.Println("Tracker Port:\t" + strconv.Itoa(trackerCommPort))
+	// // run tracker API
+	// go httpTrackerAPI(serverKeys)
+	// fmt.Println("Tracker Port:\t" + strconv.Itoa(trackerCommPort))
 
-	// open server channel
-	go ServerSocketAPI(serverKeys)
-	fmt.Println("Server Port:\t" + strconv.Itoa(serverCommPort))
+	// // open server channel
+	// go ServerSocketAPI(serverKeys)
+	// fmt.Println("Server Port:\t" + strconv.Itoa(serverCommPort))
 
 	// open client channel
-	go ClientSocketAPI(serverKeys)
-	fmt.Println("Client Port:\t" + strconv.Itoa(clientCommPort))
+	go SocketAPI(serverKeys)
+	fmt.Println("Socket Port:\t" + strconv.Itoa(clientCommPort))
 
 	announce("Web Frontend Up!")
 	go serverWebAPI()
@@ -40,8 +40,4 @@ func main() {
 
 	// blocking operation
 	select {}
-}
-
-func announce(message string) {
-	fmt.Printf("\n" + nc + green + "╔══════════════════════════════════════════╗\n   " + brightcyan + "+ " + message + green + "\n╚══════════════════════════════════════════╝\n\n" + nc)
 }

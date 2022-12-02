@@ -17,6 +17,11 @@ func sanitizeString(dirtyString string, maxlen int) string {
 	return re.ReplaceAllString(dirtyString, "")
 }
 
+func announce(message string) {
+	fmt.Printf(
+		"\n" + nc + green + "---------------------------------------------\n   " + brightcyan + "+ " + message + green + "\n---------------------------------------------\n\n" + nc)
+}
+
 // fileExists Does this file exist?
 func fileExists(filename string) bool {
 	referencedFile, err := os.Stat(filename)

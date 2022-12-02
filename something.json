@@ -1,6 +1,0 @@
-{
-  "to": "pubkey",
-  "from": "pubkey",
-  "msgbody": "something",
-  "sig": "signature"
-}
