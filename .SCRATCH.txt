@@ -1,4 +1,5 @@
-ok so where im leaving off right now is cleaving off the key creation stuff on the server side. britt was busting my balls about how hes gonna ddos it so fuck it, users create their own keys, and can verify sigs with the server.
+following the channel model here: https://golangdocs.com/golang-gorilla-websockets
+
 
 where we're at now is we need a way to first get the server to relay a message from user to user.
 
