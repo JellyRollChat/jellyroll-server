@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -47,27 +48,62 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 		if bytes.HasPrefix(msg, pingMsg) {
 			conn.WriteMessage(msgType, []byte(keyCollection.publicKey))
-		} else if bytes.HasPrefix(msg, mesgMsg) {
-			fmt.Println("Full name:")
+		} else if bytes.HasPrefix(msg, infoMsg) {
+			fmt.Println("Full User ID:")
 			fullnameb := hex.EncodeToString([]byte("username@server.tld"))
 			fmt.Println(fullnameb)
-			fmt.Println("Short name: ")
+			fmt.Println("Short nickname: ")
 			shortnameb := hex.EncodeToString([]byte("username"))
 			fmt.Println(shortnameb)
 			fmt.Println("Body: ")
-			bodyb := hex.EncodeToString([]byte("This is my first mesg"))
+			bodyb := hex.EncodeToString([]byte("This is a test message!"))
 			fmt.Println(bodyb)
 			fmt.Println("Full Message: ")
-			fullmesgb := "<<to:" + fullnameb + "::body:" + bodyb + ">>"
+			fullmesgb := "<^_-:" + fullnameb + "<._o>" + bodyb + ":-_^>"
 			fmt.Println(fullmesgb)
-			// message format
-			// <<to:username@server.tld::body:54686973206973206d79206669727374206d657367>>
-
 			conn.WriteMessage(msgType, []byte(fullmesgb))
 
 			thisDecodedMesg, _ := hex.DecodeString(fullmesgb)
 
 			conn.WriteMessage(msgType, thisDecodedMesg)
+		} else if bytes.HasPrefix(msg, testMsg) {
+
+			msgStr := string(msg)
+
+			trimLCarrot := strings.TrimLeft(msgStr, "<^_-:")
+			trimRCarrot := strings.TrimRight(trimLCarrot, ":-_^>")
+			splitUsrMsg := strings.Split(trimRCarrot, "<._o>")
+
+			fmt.Println("Full User ID:")
+			fmt.Println("Encoded: ", splitUsrMsg[0])
+
+			usernameEnc := fmt.Sprintf("%s", splitUsrMsg[0])
+			fmt.Println("Encoded: ", usernameEnc)
+			decodedUserName, decodeErr := hex.DecodeString(usernameEnc)
+			if decodeErr != nil {
+				fmt.Println("There was an error decoding the username. ")
+			} else {
+				fmt.Println("Decoded bytes: ", decodedUserName)
+				fmt.Println("Decoded string: ", string(decodedUserName))
+			}
+
+			fmt.Println("Message Body:")
+
+			fmt.Println("Encoded: ", splitUsrMsg[1])
+
+			bodyEnc := fmt.Sprintf("%s", splitUsrMsg[1])
+			fmt.Println("Encoded: ", bodyEnc)
+			decodedBody, decodeErr := hex.DecodeString(bodyEnc)
+			if decodeErr != nil {
+				fmt.Println("There was an error decoding the body. ")
+			} else {
+				fmt.Println("Decoded bytes: ", decodedBody)
+				fmt.Println("Decoded string: ", string(decodedBody))
+			}
+
+			thisDecodedMesg := "<^_-:" + string(decodedUserName) + "<._o>" + string(decodedBody) + ":-_^>"
+
+			conn.WriteMessage(msgType, []byte(thisDecodedMesg))
 		}
 
 	}
