@@ -72,7 +72,7 @@ var (
 
 var (
 	pingMsg  []byte = []byte("PING")
-	mesgMsg  []byte = []byte("MESG")
+	mesgMsg  []byte = []byte("INFO")
 	upgrader        = websocket.Upgrader{
 		EnableCompression: true,
 		ReadBufferSize:    1024,
