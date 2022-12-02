@@ -71,9 +71,9 @@ var (
 )
 
 var (
-	pingMsg  []byte = []byte("PING")
-	infoMsg  []byte = []byte("INFO")
-	testMsg  []byte = []byte("TEST")
+	pingMsg  []byte = []byte("!!")
+	infoMsg  []byte = []byte("??")
+	rglrMsg  []byte = []byte("<:")
 	upgrader        = websocket.Upgrader{
 		EnableCompression: true,
 		ReadBufferSize:    1024,

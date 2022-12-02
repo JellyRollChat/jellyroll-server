@@ -56,7 +56,7 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			shortnameb := hex.EncodeToString([]byte("username"))
 			fmt.Println(shortnameb)
 			fmt.Println("Body: ")
-			bodyb := hex.EncodeToString([]byte("This is a test message!"))
+			bodyb := hex.EncodeToString([]byte("My public key is: " + keyCollection.publicKey))
 			fmt.Println(bodyb)
 			fmt.Println("Full Message: ")
 			fullmesgb := "<:" + fullnameb + "," + bodyb + ":>"
@@ -66,17 +66,15 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			thisDecodedMesg, _ := hex.DecodeString(fullmesgb)
 
 			conn.WriteMessage(msgType, thisDecodedMesg)
-		} else if bytes.HasPrefix(msg, testMsg) {
+		} else if bytes.HasPrefix(msg, rglrMsg) {
 
 			msgStr := string(msg)
 
-			trimLCarrot := strings.TrimLeft(msgStr, "TEST <:")
+			trimLCarrot := strings.TrimLeft(msgStr, "<:")
 			trimRCarrot := strings.TrimRight(trimLCarrot, ":>")
 			splitUsrMsg := strings.Split(trimRCarrot, ",")
 
 			fmt.Println("Full User ID:")
-			fmt.Println("Encoded: ", splitUsrMsg[0])
-
 			usernameEnc := fmt.Sprintf("%s", splitUsrMsg[0])
 			fmt.Println("Encoded: ", usernameEnc)
 			decodedUserName, decodeErr := hex.DecodeString(usernameEnc)
@@ -88,9 +86,6 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			}
 
 			fmt.Println("Message Body:")
-
-			fmt.Println("Encoded: ", splitUsrMsg[1])
-
 			bodyEnc := fmt.Sprintf("%s", splitUsrMsg[1])
 			fmt.Println("Encoded: ", bodyEnc)
 			decodedBody, decodeErr := hex.DecodeString(bodyEnc)
