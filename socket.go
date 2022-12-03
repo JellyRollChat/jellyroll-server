@@ -44,14 +44,14 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 		}
 
 		thisMessage := Message{}
-		unmarshalError := json.Unmarshal(msg, thisMessage)
+		unmarshalError := json.Unmarshal(msg, &thisMessage)
 		if unmarshalError != nil {
 			log.Println(unmarshalError)
 		}
 
 		// msgType := 1
 
-		conn.WriteJSON(thisMessage)
+		conn.WriteJSON(&thisMessage)
 		// thisMessage := Message{
 		// 	Type: 200,
 		// 	From: "alex@server.3ck0.com",
