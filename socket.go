@@ -47,29 +47,12 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 		thisMessage := Message{}
 
-		unmarshalError := json.Unmarshal(msg, &thisMessage)
+		unmarshalError := json.Unmarshal(msg, thisMessage)
 		if unmarshalError != nil {
 			log.Println(unmarshalError)
 		}
-		log.Println("thisMessage: ", thisMessage)
-		log.Println("&thisMessage: ", &thisMessage)
 
-		// msgType := 1
-
-		conn.WriteJSON(&thisMessage)
-		// thisMessage := Message{
-		// 	Type: 200,
-		// 	From: "alex@server.3ck0.com",
-		// 	Recv: "bess@server.3cko.com",
-		// 	Body: "Hello this is a test",
-		// }
-
-		// thisMsgJson, thisMsgJsonErr := json.Marshal(thisMessage)
-		// if thisMsgJsonErr != nil {
-		// 	log.Println("There was an error marshalling the JSON for this message")
-		// }
-
-		// conn.WriteMessage(msgType, thisMsgJson)
+		conn.WriteJSON(thisMessage)
 
 	}
 
