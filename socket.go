@@ -49,7 +49,7 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			log.Println(unmarshalError)
 		}
 
-		msgType := 1
+		// msgType := 1
 
 		conn.WriteJSON(thisMessage)
 		// thisMessage := Message{
