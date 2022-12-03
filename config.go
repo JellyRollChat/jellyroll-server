@@ -80,3 +80,10 @@ var (
 		WriteBufferSize:   1024,
 	}
 )
+
+type Message struct {
+	Type int    `json:"type"`
+	From string `json:"from"`
+	Recv string `json:"recv"`
+	Body string `json:"body"`
+}

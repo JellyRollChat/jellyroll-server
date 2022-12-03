@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -62,6 +64,21 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			fullmesgb := "<:" + fullnameb + "," + bodyb + ":>"
 			fmt.Println(fullmesgb)
 			conn.WriteMessage(msgType, []byte(fullmesgb))
+
+			thisMessage := Message{
+				Type: 200,
+				From: "alex@server.3ck0.com",
+				Recv: "bess@server.3cko.com",
+				Body: "Hello this is a test",
+			}
+
+			thisMsgJson, thisMsgJsonErr := json.Marshal(thisMessage)
+			if thisMsgJsonErr != nil {
+				log.Println("There was an error marshalling the JSON for this message")
+			}
+
+			conn.WriteMessage(msgType, thisMsgJson)
+
 		} else if bytes.HasPrefix(msg, rglrMsg) {
 
 			msgStr := string(msg)
