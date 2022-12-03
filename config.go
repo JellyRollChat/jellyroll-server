@@ -11,7 +11,9 @@ const (
 	serverCommPort  = 5268
 	clientCommPort  = 5267
 
-	servertld = "server.3ck0.com"
+	servertld     = "server.3ck0.com"
+	defaultUser   = "admin"
+	defaultSender = defaultUser + "@" + servertld
 
 	pubKeyFilePath    = "keys/" + "public.key"
 	privKeyFilePath   = "keys/" + "private.key"

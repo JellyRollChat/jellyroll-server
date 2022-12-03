@@ -77,7 +77,9 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 				log.Println("There was an error marshalling the JSON for this message")
 			}
 
-			conn.WriteMessage(msgType, thisMsgJson)
+			thisMsgJsonBytes := hex.EncodeToString(thisMsgJson)
+
+			conn.WriteMessage(msgType, []byte(thisMsgJsonBytes))
 
 		} else if bytes.HasPrefix(msg, rglrMsg) {
 
