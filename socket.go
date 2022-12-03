@@ -38,12 +38,9 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 		defer conn.Close()
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
-			// socket session closed
 			fmt.Printf(brightyellow+"\n[%s] [%s] Peer disconnected\n"+white, timeStamp(), conn.RemoteAddr())
 			break
 		}
-
-		fmt.Println("Raw message from the socket: ", string(msg))
 
 		thisMessage := Message{}
 
@@ -52,8 +49,26 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			log.Println(unmarshalError)
 		}
 
+		triageSocketMsg(&thisMessage, conn)
 		conn.WriteJSON(&thisMessage)
 
+	}
+
+}
+
+func triageSocketMsg(msg *Message, conn *websocket.Conn) {
+
+	if msg.Type == 100 {
+		log.Println("message type 100")
+		log.Println("this is a friend request")
+		conn.WriteMessage(1, []byte("friend request"))
+	} else if msg.Type == 200 {
+		log.Println("message type 200")
+		log.Println("this is a normal chat message")
+		conn.WriteMessage(1, []byte("chat message"))
+	} else {
+		log.Println("I didn't understand this message")
+		conn.WriteMessage(1, []byte("didn't understand this request"))
 	}
 
 }
