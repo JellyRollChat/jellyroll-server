@@ -71,10 +71,14 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 			msgStr := string(msg)
 
+			log.Println("msgStr: ", msgStr)
+
 			decodedMsg, decodedMsgErr := hex.DecodeString(msgStr)
 			if decodedMsgErr != nil {
 				log.Println("decode error: ", decodedMsgErr)
 			}
+
+			log.Println("decoded: ", decodedMsg)
 
 			conn.WriteMessage(msgType, []byte(decodedMsg))
 		}
