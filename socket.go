@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -45,43 +43,29 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			break
 		}
 
-		msgType := 1
-
-		if bytes.HasPrefix(msg, pingMsg) {
-			conn.WriteMessage(msgType, []byte(pingMsg))
-		} else if bytes.HasPrefix(msg, infoMsg) {
-
-			thisMessage := Message{
-				Type: 200,
-				From: "alex@server.3ck0.com",
-				Recv: "bess@server.3cko.com",
-				Body: "Hello this is a test",
-			}
-
-			thisMsgJson, thisMsgJsonErr := json.Marshal(thisMessage)
-			if thisMsgJsonErr != nil {
-				log.Println("There was an error marshalling the JSON for this message")
-			}
-
-			thisMsgJsonBytes := hex.EncodeToString(thisMsgJson)
-
-			conn.WriteMessage(msgType, []byte(thisMsgJsonBytes))
-
-		} else if bytes.HasPrefix(msg, rglrMsg) {
-
-			msgStr := string(msg)
-
-			log.Println("msgStr: ", msgStr)
-
-			decodedMsg, decodedMsgErr := hex.DecodeString(msgStr)
-			if decodedMsgErr != nil {
-				log.Println("decode error: ", decodedMsgErr)
-			}
-
-			log.Println("decoded: ", decodedMsg)
-
-			conn.WriteMessage(msgType, []byte(decodedMsg))
+		thisMessage := Message{}
+		unmarshalError := json.Unmarshal(msg, thisMessage)
+		if unmarshalError != nil {
+			log.Println(unmarshalError)
 		}
 
+		msgType := 1
+
+		conn.WriteJSON(thisMessage)
+		// thisMessage := Message{
+		// 	Type: 200,
+		// 	From: "alex@server.3ck0.com",
+		// 	Recv: "bess@server.3cko.com",
+		// 	Body: "Hello this is a test",
+		// }
+
+		// thisMsgJson, thisMsgJsonErr := json.Marshal(thisMessage)
+		// if thisMsgJsonErr != nil {
+		// 	log.Println("There was an error marshalling the JSON for this message")
+		// }
+
+		conn.WriteMessage(msgType, thisMsgJson)
+
 	}
+
 }
