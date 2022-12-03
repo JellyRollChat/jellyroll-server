@@ -47,12 +47,12 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 		thisMessage := Message{}
 
-		unmarshalError := json.Unmarshal(msg, thisMessage)
+		unmarshalError := json.Unmarshal(msg, &thisMessage)
 		if unmarshalError != nil {
 			log.Println(unmarshalError)
 		}
 
-		conn.WriteJSON(thisMessage)
+		conn.WriteJSON(&thisMessage)
 
 	}
 
