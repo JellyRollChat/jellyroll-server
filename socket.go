@@ -43,11 +43,16 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			break
 		}
 
+		fmt.Println("Raw message from the socket: ", msg)
+
 		thisMessage := Message{}
+
 		unmarshalError := json.Unmarshal(msg, &thisMessage)
 		if unmarshalError != nil {
 			log.Println(unmarshalError)
 		}
+		log.Println("thisMessage: ", thisMessage)
+		log.Println("&thisMessage: ", &thisMessage)
 
 		// msgType := 1
 
