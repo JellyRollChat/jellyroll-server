@@ -43,7 +43,7 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 			break
 		}
 
-		fmt.Println("Raw message from the socket: ", msg)
+		fmt.Println("Raw message from the socket: ", string(msg))
 
 		thisMessage := Message{}
 
