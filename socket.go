@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -51,19 +50,6 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 		if bytes.HasPrefix(msg, pingMsg) {
 			conn.WriteMessage(msgType, []byte(pingMsg))
 		} else if bytes.HasPrefix(msg, infoMsg) {
-			fmt.Println("Full User ID:")
-			fullnameb := hex.EncodeToString([]byte("username@server.tld"))
-			fmt.Println(fullnameb)
-			fmt.Println("Short nickname: ")
-			shortnameb := hex.EncodeToString([]byte("username"))
-			fmt.Println(shortnameb)
-			fmt.Println("Body: ")
-			bodyb := hex.EncodeToString([]byte("My public key is: " + keyCollection.publicKey))
-			fmt.Println(bodyb)
-			fmt.Println("Full Message: ")
-			fullmesgb := "<:" + fullnameb + "," + bodyb + ":>"
-			fmt.Println(fullmesgb)
-			conn.WriteMessage(msgType, []byte(fullmesgb))
 
 			thisMessage := Message{
 				Type: 200,
@@ -85,35 +71,12 @@ func socketParser(conn *websocket.Conn, keyCollection *ED25519Keys) {
 
 			msgStr := string(msg)
 
-			trimLCarrot := strings.TrimLeft(msgStr, "<:")
-			trimRCarrot := strings.TrimRight(trimLCarrot, ":>")
-			splitUsrMsg := strings.Split(trimRCarrot, ",")
-
-			fmt.Println("Full User ID:")
-			usernameEnc := fmt.Sprintf("%s", splitUsrMsg[0])
-			fmt.Println("Encoded: ", usernameEnc)
-			decodedUserName, decodeErr := hex.DecodeString(usernameEnc)
-			if decodeErr != nil {
-				fmt.Println("There was an error decoding the username. ")
-			} else {
-				fmt.Println("Decoded bytes: ", decodedUserName)
-				fmt.Println("Decoded string: ", string(decodedUserName))
+			decodedMsg, decodedMsgErr := hex.DecodeString(msgStr)
+			if decodedMsgErr != nil {
+				log.Println("decode error: ", decodedMsgErr)
 			}
 
-			fmt.Println("Message Body:")
-			bodyEnc := fmt.Sprintf("%s", splitUsrMsg[1])
-			fmt.Println("Encoded: ", bodyEnc)
-			decodedBody, decodeErr := hex.DecodeString(bodyEnc)
-			if decodeErr != nil {
-				fmt.Println("There was an error decoding the body. ")
-			} else {
-				fmt.Println("Decoded bytes: ", decodedBody)
-				fmt.Println("Decoded string: ", string(decodedBody))
-			}
-
-			thisDecodedMesg := "<:" + string(decodedUserName) + "," + string(decodedBody) + ":>"
-
-			conn.WriteMessage(msgType, []byte(thisDecodedMesg))
+			conn.WriteMessage(msgType, []byte(decodedMsg))
 		}
 
 	}
