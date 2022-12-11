@@ -12,9 +12,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type CommPacket struct {
-}
-
 func SocketAPI(keyCollection *ED25519Keys) {
 
 	api := mux.NewRouter()
