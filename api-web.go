@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -15,8 +14,8 @@ import (
 func serverWebAPI() {
 
 	api := mux.NewRouter()
-	api.HandleFunc("/signup", SignupHandlerGET).Methods(http.MethodGet)
-	api.HandleFunc("/signup/", SignupHandlerGET).Methods(http.MethodGet)
+	// api.HandleFunc("/signup", SignupHandlerGET).Methods(http.MethodGet)
+	// api.HandleFunc("/signup/", SignupHandlerGET).Methods(http.MethodGet)
 	api.HandleFunc("/signup", SignupHandlerPOST).Methods(http.MethodPost)
 	api.HandleFunc("/signup/", SignupHandlerPOST).Methods(http.MethodPost)
 
@@ -28,26 +27,26 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("\n"+purple+r.Method+" "+brightgreen+"/%s"+white+" by "+brightcyan+"%s\n"+white+"Agent: "+cyan+"%s\n"+nc, name, r.RemoteAddr, userAgent)
 }
 
-func SignupHandlerGET(w http.ResponseWriter, r *http.Request) {
-	reportRequest("signup", w, r)
-	files := []string{
-		"templates/signup.html",
-	}
+// func SignupHandlerGET(w http.ResponseWriter, r *http.Request) {
+// 	reportRequest("signup", w, r)
+// 	files := []string{
+// 		"templates/signup.html",
+// 	}
 
-	t, parseSignupFiles := template.ParseFiles(files...)
+// 	t, parseSignupFiles := template.ParseFiles(files...)
 
-	handle("", parseSignupFiles)
-	if parseSignupFiles != nil {
+// 	handle("", parseSignupFiles)
+// 	if parseSignupFiles != nil {
 
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+// 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 
-		return
-	}
+// 		return
+// 	}
 
-	whatswrong := t.Execute(w, servertld)
-	handle("http signup render error", whatswrong)
+// 	whatswrong := t.Execute(w, servertld)
+// 	handle("http signup render error", whatswrong)
 
-}
+// }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	reportRequest("signup", w, r)
@@ -66,8 +65,6 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 			thisSignup.username = sanitizeString(value[0], 20)
 		} else if key == "signupPassword" {
 			thisSignup.password = value[0]
-		} else if key == "signupPasswordRepeat" {
-			thisSignup.passRepeat = value[0]
 		}
 	}
 
@@ -82,12 +79,6 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		if len(thisSignup.username) > 20 {
 			log.Println(brightred + "Username is too long " + nc)
 			fmt.Fprintf(w, "Username is too long ")
-			return
-		}
-
-		if strings.Compare(thisSignup.password, thisSignup.passRepeat) != 0 {
-			log.Println(brightred + "Passwords don't match " + nc)
-			fmt.Fprintf(w, "Passwords don't match ")
 			return
 		}
 
@@ -134,7 +125,7 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		whatswrong := t.Execute(w, thisUser)
 		handle("http signup success render error", whatswrong)
 
-		// fmt.Fprintf(w, "Success! You can now use your username and password to login. \n\nUsername: %s\nServer: %s\n\nGive your friends this address: %s\n\nTip: It looks like an email but it's really your full username.", thisSignup.username, servertld, thisSignup.username+"@"+servertld)
+		fmt.Fprintf(w, "\"OK\"")
 
 		log.Println(brightmagenta + "New User: " + magenta + thisSignup.username + "@" + servertld)
 		// return

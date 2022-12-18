@@ -73,9 +73,6 @@ var (
 )
 
 var (
-	// pingMsg  []byte = []byte("!!")
-	// infoMsg  []byte = []byte("??")
-	// rglrMsg  []byte = []byte("<:")
 	upgrader = websocket.Upgrader{
 		EnableCompression: true,
 		ReadBufferSize:    1024,
@@ -93,13 +90,13 @@ type Message struct {
 }
 
 // StateExchange is an interaction with the server that conveys busy status, current friends list, unconfirmed friend requests, blocked users and blocked servers. When a friend request is received from the server, that friend ID is added to the PendingFriends. If it is accepted, the friend ID is added to Friends and removed from PendingFriends, then a StateExchange is sent back to the server to reflect the change. Rejected friend request does not add to BlockedFriends, but the user is presented with accept, reject, block menu.
-// BusyStatus: 0 offline, 1 online , 2 busy
+// Online: boolean
 // Friends: json list of current friends
 // PendingFriends: unconfirmed, denied friend requests
 // BlockedFriends: drop messages from these users
 // BlockedServers: drop messages from these servers
 type StateExchange struct {
-	BusyStatus     int      `json:"busy_status"`
+	Online         bool     `json:"online"`
 	Friends        []string `json:"friends"`
 	PendingFriends []string `json:"pending_friends"`
 	BlockedFriends []string `json:"blocked_friends"`
