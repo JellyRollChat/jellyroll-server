@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,6 +13,7 @@ import (
 
 func serverWebAPI() {
 
+	log.Println("API launched")
 	api := mux.NewRouter()
 	api.HandleFunc("/signup", SignupHandlerPOST).Methods(http.MethodPost)
 	api.HandleFunc("/signup/", SignupHandlerPOST).Methods(http.MethodPost)
@@ -29,12 +29,9 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	reportRequest("signup", w, r)
 
-	type SignupObject struct {
-		Username string
-		Password string
-	}
+	log.Println(r.Body)
 
-	thisSignup := SignupObject{}
+	thisSignup := AuthObject{}
 
 	// unmarshall json string to struct
 	err := json.NewDecoder(r.Body).Decode(&thisSignup)
@@ -43,9 +40,13 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println(thisSignup.Username)
+	log.Println(thisSignup.Password)
+
 	r.ParseForm()
 	for key, value := range r.Form {
-		if key == "signupUsername" {
+		log.Println("key: ", key, "value: ", value)
+		if key == "username" {
 			thisSignup.Username = sanitizeString(value[0], 20)
 		} else if key == "signupPassword" {
 			thisSignup.Password = value[0]
@@ -80,21 +81,7 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 
 		thisSignup.Password = hashit(thisSignup.Password)
 
-		appendFile("admin/users.list", thisSignup.Username+"::"+thisSignup.Password+"\n")
-
-		files := []string{
-			"templates/signupSuccess.html",
-		}
-
-		t, parseSignupFiles := template.ParseFiles(files...)
-
-		handle("error parsing signupsuccess view: ", parseSignupFiles)
-		if parseSignupFiles != nil {
-
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-
-			return
-		}
+		appendFile("admin/users.list", thisSignup.Username+"@"+servertld+","+thisSignup.Password+"\n")
 
 		type userInfo struct {
 			Username  string
@@ -106,17 +93,17 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		thisUser.Servertld = servertld
 		thisUser.Username = thisSignup.Username
 
-		whatswrong := t.Execute(w, thisUser)
-		handle("http signup success render error", whatswrong)
+		fullusername := thisSignup.Username + "@" + servertld
 
-		fmt.Fprintf(w, "\"OK\"")
+		fmt.Fprintf(w, "{\"status\":\"success\",\"fullname\":\""+fullusername+"\"}")
 
 		log.Println(brightmagenta + "New User: " + magenta + thisSignup.Username + "@" + servertld)
 		// return
 
 	} else {
 		log.Println(brightred + "Username is not available " + nc)
-		fmt.Fprintf(w, "Username is not available ")
+		fmt.Fprintf(w, "{\"status\":\"success\",\"fullname\":\"none\"}")
+
 		return
 	}
 

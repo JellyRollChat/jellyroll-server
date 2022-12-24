@@ -80,10 +80,20 @@ var (
 	}
 )
 
-// Message is a simple format for basic user<->user messages that are passed through a server
+// Packet is an object to encapsulate messages
 // Types: 100 friend request, 200 normal message user to user
+type Packet struct {
+	MsgType    int    `json:"msg_type"`
+	MsgContent string `json:"msg_content"`
+}
+
+type AuthObject struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+// Message is a simple format for basic user<->user messages that are passed through a server
 type Message struct {
-	Type int    `json:"type"`
 	From string `json:"from"`
 	Recv string `json:"recv"`
 	Body string `json:"body"`

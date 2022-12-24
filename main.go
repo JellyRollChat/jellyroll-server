@@ -22,14 +22,6 @@ func main() {
 
 	announce("Sockets Up!")
 
-	// // run tracker API
-	// go httpTrackerAPI(serverKeys)
-	// fmt.Println("Tracker Port:\t" + strconv.Itoa(trackerCommPort))
-
-	// // open server channel
-	// go ServerSocketAPI(serverKeys)
-	// fmt.Println("Server Port:\t" + strconv.Itoa(serverCommPort))
-
 	// open client channel
 	go SocketAPI(serverKeys)
 	fmt.Println("Socket Port:\t" + strconv.Itoa(clientCommPort))
