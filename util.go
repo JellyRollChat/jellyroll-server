@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -137,4 +140,28 @@ func deleteFile(filename string) {
 
 func validJSON(stringToValidate string) bool {
 	return json.Valid([]byte(stringToValidate))
+}
+
+func splitUserPassStr(userpass string) []string {
+	return strings.Split(userpass, ",")
+}
+
+func stringExistsInFile(thisString string) bool {
+	f, err := os.Open("admin/users.list")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		if thisString == scanner.Text() {
+			return true
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return false
 }

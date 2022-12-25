@@ -24,6 +24,11 @@ const (
 var serverKeys *ED25519Keys
 
 var (
+	UserSessions   = make(chan UserSession)
+	OutboxMessages = make(chan Packet)
+)
+
+var (
 	corsAllowedHeaders = []string{
 		"Access-Control-Allow-Headers",
 		"Access-Control-Allow-Methods",
@@ -92,6 +97,12 @@ type AuthObject struct {
 	Password string `json:"password"`
 }
 
+type UserSession struct {
+	Username  string
+	Servertld string
+	Conn      *websocket.Conn
+}
+
 // Message is a simple format for basic user<->user messages that are passed through a server
 type Message struct {
 	From string `json:"from"`
@@ -100,15 +111,13 @@ type Message struct {
 }
 
 // StateExchange is an interaction with the server that conveys busy status, current friends list, unconfirmed friend requests, blocked users and blocked servers. When a friend request is received from the server, that friend ID is added to the PendingFriends. If it is accepted, the friend ID is added to Friends and removed from PendingFriends, then a StateExchange is sent back to the server to reflect the change. Rejected friend request does not add to BlockedFriends, but the user is presented with accept, reject, block menu.
-// Online: boolean
-// Friends: json list of current friends
+// CurrentFriends: json list of current friends
 // PendingFriends: unconfirmed, denied friend requests
 // BlockedFriends: drop messages from these users
 // BlockedServers: drop messages from these servers
 type StateExchange struct {
-	Online         bool     `json:"online"`
-	Friends        []string `json:"friends"`
 	PendingFriends []string `json:"pending_friends"`
+	CurrentFriends []string `json:"current_friends"`
 	BlockedFriends []string `json:"blocked_friends"`
 	BlockedServers []string `json:"blocked_servers"`
 }

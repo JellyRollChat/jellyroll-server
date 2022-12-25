@@ -11,6 +11,7 @@ func main() {
 
 	createDirIfItDontExist("keys")
 	createDirIfItDontExist("admin")
+	createDirIfItDontExist("admin/users")
 
 	osCheck()
 	serverKeys = initKeys()

@@ -1,14 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -48,20 +45,61 @@ func socketHandler(conn *websocket.Conn, keyCollection *ED25519Keys) {
 		log.Println("unmarshal error", unmarshalError)
 	}
 
-	socketMsgRouter(&thisMessage, conn)
+	if thisMessage.MsgType != 100 {
+		log.Println("User attempted message without valid login session, disconnecting.")
+		conn.WriteMessage(1, []byte("Access Denied!"))
+		conn.Close()
+	}
+	// socketMsgRouter(&thisMessage, conn)
+	loginHandler(&thisMessage, conn)
 	conn.WriteJSON(&thisMessage)
 
 }
 
-func socketMsgRouter(msg *Packet, conn *websocket.Conn) {
+func loginHandler(msg *Packet, conn *websocket.Conn) {
+	log.Println("loginHandler reached")
+	log.Println("Login contents: ", msg.MsgContent)
+	userpass := splitUserPassStr(msg.MsgContent)
+	log.Println("Login username: ", userpass[0])
+	log.Println("Login password: ", userpass[1])
+	if stringExistsInFile(msg.MsgContent) {
+		if !fileExists("admin/users/" + userpass[0] + ".state") {
+			createFile("admin/users/" + userpass[0] + ".state")
+			thisUserState := StateExchange{
+				CurrentFriends: []string{
+					"esp@3ck0.com",
+				},
+				PendingFriends: []string{},
+				BlockedFriends: []string{},
+				BlockedServers: []string{},
+			}
+			marshalState, msErr := json.Marshal(thisUserState)
+			if msErr != nil {
+				log.Println("Marshal Error: " + msErr.Error())
+				conn.WriteMessage(1, []byte("Marshal Error"))
+				conn.Close()
+				return
+			}
+			writeFile("admin/users/"+userpass[0]+".state", string(marshalState))
+			thisFile := readFile("admin/users/" + userpass[0] + ".state")
+			log.Println("This user's state: " + thisFile)
+			conn.WriteJSON(marshalState)
+			log.Println("User state created: " + "admin/users/" + userpass[0] + ".state")
 
-	if msg.MsgType == 100 {
-		log.Println("message type 100")
-		log.Println("this is a login auth request")
-		loginHandler(msg, conn)
+		} else if stringExistsInFile(msg.MsgContent) {
+			log.Println("User state exists: " + "admin/users/" + userpass[0] + ".state")
+
+			thisFile := readFile("admin/users/" + userpass[0] + ".state")
+			conn.WriteMessage(1, []byte(thisFile))
+		}
+		log.Println(msg.MsgContent)
+		log.Println("User exists in user list")
+		conn.WriteMessage(1, []byte("Welcome :)"))
+		authdSocketMsgWriter(conn)
 	} else {
-		log.Println("I didn't understand this message")
-		conn.WriteMessage(1, []byte("didn't understand this request"))
+		log.Println("User does not exist in user list")
+		conn.WriteMessage(1, []byte("Access Denied. Goodbye!"))
+		conn.Close()
 	}
 
 }
@@ -99,46 +137,4 @@ func authdSocketMsgWriter(conn *websocket.Conn) {
 
 	}
 
-}
-
-func splitUserPassStr(userpass string) []string {
-	return strings.Split(userpass, ",")
-}
-
-func loginHandler(msg *Packet, conn *websocket.Conn) {
-	log.Println("loginHandler reached")
-	log.Println("Login contents: ", msg.MsgContent)
-	userpass := splitUserPassStr(msg.MsgContent)
-	log.Println("Login username: ", userpass[0])
-	log.Println("Login password: ", userpass[1])
-	if stringExistsInFile(msg.MsgContent) {
-		log.Println("User exists in user list")
-		conn.WriteMessage(1, []byte("Welcome :)"))
-		authdSocketMsgWriter(conn)
-	} else {
-		log.Println("User does not exist in user list")
-		conn.WriteMessage(1, []byte("Access Denied. Goodbye!"))
-		conn.Close()
-	}
-
-}
-
-func stringExistsInFile(thisString string) bool {
-	f, err := os.Open("admin/users.list")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		if thisString == scanner.Text() {
-			return true
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	return false
 }
