@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/websocket"
 )
@@ -22,6 +24,7 @@ const (
 )
 
 var serverKeys *ED25519Keys
+
 
 var (
 	UserSessions   = make(chan UserSession)
@@ -101,4 +104,25 @@ type StateExchange struct {
 	CurrentFriends []string `json:"current_friends"`
 	BlockedFriends []string `json:"blocked_friends"`
 	BlockedServers []string `json:"blocked_servers"`
+}
+
+// FedMessage struct includes fields for the message ID, the sender and recipient IDs, the message content, a timestamp for when the message was sent, and the URLs for the sender and recipient servers. The fields for the sender and recipient servers are necessary in a federated messaging system to keep track of where the message should be sent and where it came from.
+type FedMessage struct {
+	ID                 string    `json:"id"`
+	SenderID           string    `json:"sender_id"`
+	RecipientID        string    `json:"recipient_id"`
+	Content            string    `json:"content"`
+	Timestamp          time.Time `json:"timestamp"`
+	SenderServerURL    string    `json:"sender_server_url"`
+	RecipientServerURL string    `json:"recipient_server_url"`
+}
+
+var GlobalFedServers = make(map[string]*FedServer)
+
+
+type FedServer struct {
+	URL      string                 `json:"url"`
+	Inbox    chan *FedMessage       `json:"inbox"`
+	Outbox   chan *FedMessage       `json:"outbox"`
+	Messages map[string]*FedMessage `json:"messages"`
 }
