@@ -113,9 +113,9 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 		// UserSessions <- thisSession
 		// log.Println("UserSessions Channel After: ", UserSessions)
 		// log.Println("UserSessions Channel After Length: ", len(UserSessions))
-		log.Println("Global sessions: ", len(GlobalSessions))
-		GlobalSessions = append(GlobalSessions, thisSession)
-		log.Println("Global sessions: ", len(GlobalSessions))
+		log.Println("Global sessions: ", len(GlobalUserSessions))
+		AddUserSession(&thisSession)
+		log.Println("Global sessions: ", len(GlobalUserSessions))
 		authdSocketMsgWriter(conn)
 	} else {
 		log.Println("User does not exist in user list")
@@ -123,6 +123,29 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 		conn.Close()
 	}
 
+}
+
+func (s *UserSession) Listen() {
+	for {
+		var msg ClientMessage
+		err := s.Conn.ReadJSON(&msg)
+		if err != nil {
+			log.Println("error reading message from socket:", err)
+			break
+		}
+		log.Println("received message:", msg)
+	}
+}
+
+// AddUserSession adds a new user session to the global map
+func AddUserSession(s *UserSession) {
+	GlobalUserSessions[s.Username] = s
+	go s.Listen()
+}
+
+// RemoveUserSession removes a user session from the global map
+func RemoveUserSession(username string) {
+	delete(GlobalUserSessions, username)
 }
 
 func authdSocketMsgWriter(conn *websocket.Conn) {

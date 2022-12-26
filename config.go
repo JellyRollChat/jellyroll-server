@@ -25,13 +25,7 @@ const (
 
 var serverKeys *ED25519Keys
 
-var (
-	UserSessions   = make(chan UserSession)
-	OutboxMessages = make(chan Packet)
-
-	GlobalSessions = []UserSession{}
-	GlobalOutbox   = []Packet{}
-)
+var GlobalUserSessions = make(map[string]*UserSession)
 
 var (
 	corsAllowedHeaders = []string{
