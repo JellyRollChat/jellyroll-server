@@ -47,6 +47,19 @@ func (s *FedServer) SyncMessages() {
 				// message is for a specific server, send it to that server
 				server := GlobalFedServers[serverURL]
 				server.Outbox <- msg
+
+				// send message over the network using websockets
+				conn, err := websocket.Dial(server.URL, "", s.URL)
+				if err != nil {
+					log.Println("websocket dial error: ", err)
+					continue
+				}
+				err = websocket.Message.Send(conn, string(data))
+				if err != nil {
+					log.Println("websocket send error: ", err)
+					continue
+				}
+				conn.Close()
 			}
 		}
 	}

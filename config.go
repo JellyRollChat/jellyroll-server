@@ -25,7 +25,6 @@ const (
 
 var serverKeys *ED25519Keys
 
-
 var (
 	UserSessions   = make(chan UserSession)
 	OutboxMessages = make(chan Packet)
@@ -87,8 +86,8 @@ type UserSession struct {
 	Conn     *websocket.Conn `json:"conn"`
 }
 
-// Message is a simple format for basic user<->user messages that are passed through a server
-type Message struct {
+// ClientMessage is a simple format for basic user<->user messages that are passed through a server
+type ClientMessage struct {
 	From string `json:"from"`
 	Recv string `json:"recv"`
 	Body string `json:"body"`
@@ -118,7 +117,6 @@ type FedMessage struct {
 }
 
 var GlobalFedServers = make(map[string]*FedServer)
-
 
 type FedServer struct {
 	URL      string                 `json:"url"`
