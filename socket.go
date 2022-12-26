@@ -63,9 +63,14 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 	log.Println("Login username: ", userpass[0])
 	log.Println("Login password: ", userpass[1])
 	if stringExistsInFile(msg.MsgContent) {
+		thisSession := UserSession{
+			Username: userpass[0] + "@" + userpass[1],
+			State:    StateExchange{},
+			Conn:     conn,
+		}
 		if !fileExists("admin/users/" + userpass[0] + ".state") {
 			createFile("admin/users/" + userpass[0] + ".state")
-			thisUserState := StateExchange{
+			thisSession.State = StateExchange{
 				CurrentFriends: []string{
 					"esp@3ck0.com",
 				},
@@ -73,7 +78,7 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 				BlockedFriends: []string{},
 				BlockedServers: []string{},
 			}
-			marshalState, msErr := json.Marshal(thisUserState)
+			marshalState, msErr := json.Marshal(thisSession.State)
 			if msErr != nil {
 				log.Println("Marshal Error: " + msErr.Error())
 				conn.WriteMessage(1, []byte("Marshal Error"))
@@ -90,11 +95,27 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 			log.Println("User state exists: " + "admin/users/" + userpass[0] + ".state")
 
 			thisFile := readFile("admin/users/" + userpass[0] + ".state")
+			unmarshErr := json.Unmarshal([]byte(thisFile), &thisSession.State)
+			if unmarshErr != nil {
+				log.Println("Unmarshal error: " + unmarshErr.Error())
+			}
 			conn.WriteMessage(1, []byte(thisFile))
 		}
 		log.Println(msg.MsgContent)
 		log.Println("User exists in user list")
 		conn.WriteMessage(1, []byte("Welcome :)"))
+		log.Println("thisSession: ", thisSession)
+		// im commenting this out and using globalsessions for now
+		// the reason is because when i run it, im blocking at UserSessions <- thisSession
+		// log.Println("Adding session to channel")
+		// log.Println("UserSessions Channel Before: ", UserSessions)
+		// log.Println("UserSessions Channel Before Length: ", len(UserSessions))
+		// UserSessions <- thisSession
+		// log.Println("UserSessions Channel After: ", UserSessions)
+		// log.Println("UserSessions Channel After Length: ", len(UserSessions))
+		log.Println("Global sessions: ", len(GlobalSessions))
+		GlobalSessions = append(GlobalSessions, thisSession)
+		log.Println("Global sessions: ", len(GlobalSessions))
 		authdSocketMsgWriter(conn)
 	} else {
 		log.Println("User does not exist in user list")

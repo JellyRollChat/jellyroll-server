@@ -26,6 +26,9 @@ var serverKeys *ED25519Keys
 var (
 	UserSessions   = make(chan UserSession)
 	OutboxMessages = make(chan Packet)
+
+	GlobalSessions = []UserSession{}
+	GlobalOutbox   = []Packet{}
 )
 
 var (
@@ -56,28 +59,6 @@ var (
 )
 
 var (
-	nc = ""
-
-	// brightblack   = ""
-	brightred    = ""
-	brightgreen  = ""
-	brightyellow = ""
-	// brightpurple  = ""
-	brightmagenta = ""
-	brightcyan    = ""
-	// brightwhite   = ""
-
-	// black   = ""
-	// red     = ""
-	green = ""
-	// yellow  = ""
-	purple  = ""
-	magenta = ""
-	cyan    = ""
-	white   = ""
-)
-
-var (
 	upgrader = websocket.Upgrader{
 		EnableCompression: true,
 		ReadBufferSize:    1024,
@@ -98,9 +79,9 @@ type AuthObject struct {
 }
 
 type UserSession struct {
-	Username  string
-	Servertld string
-	Conn      *websocket.Conn
+	Username string          `json:"username"`
+	State    StateExchange   `json:"state"`
+	Conn     *websocket.Conn `json:"conn"`
 }
 
 // Message is a simple format for basic user<->user messages that are passed through a server

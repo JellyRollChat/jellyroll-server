@@ -27,3 +27,25 @@ func osCheck() {
 
 	}
 }
+
+var (
+	nc = ""
+
+	// brightblack   = ""
+	brightred    = ""
+	brightgreen  = ""
+	brightyellow = ""
+	// brightpurple  = ""
+	brightmagenta = ""
+	brightcyan    = ""
+	// brightwhite   = ""
+
+	// black   = ""
+	// red     = ""
+	green = ""
+	// yellow  = ""
+	purple  = ""
+	magenta = ""
+	cyan    = ""
+	white   = ""
+)
