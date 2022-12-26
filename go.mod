@@ -7,7 +7,6 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
 	golang.org/x/crypto v0.1.0
-	golang.org/x/net v0.1.0
 )
 
 require (

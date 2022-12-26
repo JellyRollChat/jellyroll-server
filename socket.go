@@ -65,12 +65,12 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 	if stringExistsInFile(msg.MsgContent) {
 		thisSession := UserSession{
 			Username: userpass[0] + "@" + userpass[1],
-			State:    StateExchange{},
+			State:    ClientStateExchange{},
 			Conn:     conn,
 		}
 		if !fileExists("admin/users/" + userpass[0] + ".state") {
 			createFile("admin/users/" + userpass[0] + ".state")
-			thisSession.State = StateExchange{
+			thisSession.State = ClientStateExchange{
 				CurrentFriends: []string{
 					"esp@3ck0.com",
 				},

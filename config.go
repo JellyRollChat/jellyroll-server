@@ -81,24 +81,24 @@ type AuthObject struct {
 }
 
 type UserSession struct {
-	Username string          `json:"username"`
-	State    StateExchange   `json:"state"`
-	Conn     *websocket.Conn `json:"conn"`
+	Username string              `json:"username"`
+	State    ClientStateExchange `json:"state"`
+	Conn     *websocket.Conn     `json:"conn"`
 }
 
 // ClientMessage is a simple format for basic user<->user messages that are passed through a server
 type ClientMessage struct {
-	From string `json:"from"`
-	Recv string `json:"recv"`
-	Body string `json:"body"`
+	From string `json:"from"` // alice@server1.tld sending the message
+	Recv string `json:"recv"` // bob@server2.tld receiving the message
+	Body string `json:"body"` // the message body
 }
 
-// StateExchange is an interaction with the server that conveys busy status, current friends list, unconfirmed friend requests, blocked users and blocked servers. When a friend request is received from the server, that friend ID is added to the PendingFriends. If it is accepted, the friend ID is added to Friends and removed from PendingFriends, then a StateExchange is sent back to the server to reflect the change. Rejected friend request does not add to BlockedFriends, but the user is presented with accept, reject, block menu.
+// ClientStateExchange is an interaction with the server that conveys busy status, current friends list, unconfirmed friend requests, blocked users and blocked servers. When a friend request is received from the server, that friend ID is added to the PendingFriends. If it is accepted, the friend ID is added to Friends and removed from PendingFriends, then a ClientStateExchange is sent back to the server to reflect the change. Rejected friend request does not add to BlockedFriends, but the user is presented with accept, reject, block menu.
 // CurrentFriends: json list of current friends
 // PendingFriends: unconfirmed, denied friend requests
 // BlockedFriends: drop messages from these users
 // BlockedServers: drop messages from these servers
-type StateExchange struct {
+type ClientStateExchange struct {
 	PendingFriends []string `json:"pending_friends"`
 	CurrentFriends []string `json:"current_friends"`
 	BlockedFriends []string `json:"blocked_friends"`
@@ -119,8 +119,9 @@ type FedMessage struct {
 var GlobalFedServers = make(map[string]*FedServer)
 
 type FedServer struct {
-	URL      string                 `json:"url"`
-	Inbox    chan *FedMessage       `json:"inbox"`
-	Outbox   chan *FedMessage       `json:"outbox"`
-	Messages map[string]*FedMessage `json:"messages"`
+	URL       string                 `json:"url"`
+	Inbox     chan *FedMessage       `json:"inbox"`
+	Outbox    chan *FedMessage       `json:"outbox"`
+	Messages  map[string]*FedMessage `json:"messages"`
+	Websocket *websocket.Conn        `json:"websocket"`
 }
