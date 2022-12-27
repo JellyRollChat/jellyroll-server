@@ -9,10 +9,8 @@ import (
 )
 
 const (
-	webPort         = 5270
-	trackerCommPort = 5269
-	serverCommPort  = 5268
-	clientCommPort  = 5267
+	webPort        = 5270
+	clientCommPort = 5267
 
 	servertld     = "server.3ck0.com"
 	defaultUser   = "admin"
@@ -40,7 +38,6 @@ var (
 		"X-Requested-With"}
 
 	corsOrigins = []string{
-		"*",
 		"127.0.0.1",
 		"3ck0.com",
 		"server.3ck0.com",
