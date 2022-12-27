@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func serverWebAPI() {
+func WebAPI() {
 
 	log.Println("API launched")
 	api := mux.NewRouter()

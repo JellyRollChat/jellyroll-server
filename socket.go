@@ -21,7 +21,7 @@ func SocketAPI(keyCollection *ED25519Keys) {
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		conn, _ := upgrader.Upgrade(w, r, nil)
 		defer conn.Close()
-		fmt.Printf(brightgreen+"\n[%s] [%s] +client\n"+white, timeStamp(), conn.RemoteAddr())
+		fmt.Printf(brightgreen+"\n[%s] +client [%s]\n"+nc, timeStamp(), conn.RemoteAddr())
 		socketHandler(conn, keyCollection)
 	})
 
@@ -45,7 +45,7 @@ func socketHandler(conn *websocket.Conn, keyCollection *ED25519Keys) {
 		log.Println("unmarshal error", unmarshalError)
 	}
 
-	if thisMessage.MsgType != 100 {
+	if thisMessage.Type != 100 {
 		log.Println("User attempted message without valid login session, disconnecting.")
 		conn.WriteMessage(1, []byte("Access Denied!"))
 		conn.Close()
@@ -57,16 +57,14 @@ func socketHandler(conn *websocket.Conn, keyCollection *ED25519Keys) {
 }
 
 func loginHandler(msg *Packet, conn *websocket.Conn) {
-	log.Println("loginHandler reached")
-	log.Println("Login contents: ", msg.MsgContent)
-	userpass := splitUserPassStr(msg.MsgContent)
+	userpass := splitUserPassStr(msg.Content)
 	log.Println("Login username: ", userpass[0])
-	log.Println("Login password: ", userpass[1])
-	if stringExistsInFile(msg.MsgContent) {
+	if stringExistsInFile(msg.Content) {
 		thisSession := UserSession{
-			Username: userpass[0] + "@" + userpass[1],
-			State:    ClientStateExchange{},
-			Conn:     conn,
+			Username:   userpass[0] + "@" + userpass[1],
+			State:      ClientStateExchange{},
+			Conn:       conn,
+			Authorized: true,
 		}
 		if !fileExists("admin/users/" + userpass[0] + ".state") {
 			createFile("admin/users/" + userpass[0] + ".state")
@@ -86,13 +84,13 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 				return
 			}
 			writeFile("admin/users/"+userpass[0]+".state", string(marshalState))
-			thisFile := readFile("admin/users/" + userpass[0] + ".state")
-			log.Println("This user's state: " + thisFile)
+			// thisFile := readFile("admin/users/" + userpass[0] + ".state")
+			// log.Println("This user's state: " + thisFile)
 			conn.WriteJSON(marshalState)
-			log.Println("User state created: " + "admin/users/" + userpass[0] + ".state")
+			// log.Println("User state created: " + "admin/users/" + userpass[0] + ".state")
 
-		} else if stringExistsInFile(msg.MsgContent) {
-			log.Println("User state exists: " + "admin/users/" + userpass[0] + ".state")
+		} else if stringExistsInFile(msg.Content) {
+			// log.Println("User state exists: " + "admin/users/" + userpass[0] + ".state")
 
 			thisFile := readFile("admin/users/" + userpass[0] + ".state")
 			unmarshErr := json.Unmarshal([]byte(thisFile), &thisSession.State)
@@ -101,39 +99,52 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 			}
 			conn.WriteMessage(1, []byte(thisFile))
 		}
-		log.Println(msg.MsgContent)
-		log.Println("User exists in user list")
-		conn.WriteMessage(1, []byte("Welcome :)"))
-		log.Println("thisSession: ", thisSession)
-		// im commenting this out and using globalsessions for now
-		// the reason is because when i run it, im blocking at UserSessions <- thisSession
-		// log.Println("Adding session to channel")
-		// log.Println("UserSessions Channel Before: ", UserSessions)
-		// log.Println("UserSessions Channel Before Length: ", len(UserSessions))
-		// UserSessions <- thisSession
-		// log.Println("UserSessions Channel After: ", UserSessions)
-		// log.Println("UserSessions Channel After Length: ", len(UserSessions))
-		log.Println("Global sessions: ", len(GlobalUserSessions))
+		// log.Println(msg.Content)
+		// log.Println("User exists in user list")
+		conn.WriteMessage(1, []byte("OK!"))
 		AddUserSession(&thisSession)
-		log.Println("Global sessions: ", len(GlobalUserSessions))
+		log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
 		authdSocketMsgWriter(conn)
 	} else {
-		log.Println("User does not exist in user list")
-		conn.WriteMessage(1, []byte("Access Denied. Goodbye!"))
+		conn.WriteMessage(1, []byte("NO!"))
 		conn.Close()
 	}
 
 }
 
 func (s *UserSession) Listen() {
+	mutex.Lock()
+	defer mutex.Unlock()
+	if s.Conn != nil {
+		return
+	}
 	for {
 		var msg ClientMessage
 		err := s.Conn.ReadJSON(&msg)
 		if err != nil {
-			log.Println("error reading message from socket:", err)
+			log.Println("error reading message:", err)
 			break
 		}
-		log.Println("received message:", msg)
+		var packet Packet
+		err = json.Unmarshal([]byte(msg.Body), &packet)
+		if err != nil {
+			log.Println("error unmarshalling message body:", err)
+			continue
+		}
+		log.Println(packet)
+		switch packet.Type {
+		case 100:
+			if s.Authorized {
+				log.Println("100: this is a login request.")
+				log.Println("User is already logged in")
+			}
+		case 200:
+			log.Println("200: this is a friend request")
+		case 300:
+			log.Println("300: this is a normal chat message")
+		default:
+			log.Println("???: I didn't understand this message")
+		}
 	}
 }
 
@@ -158,20 +169,20 @@ func authdSocketMsgWriter(conn *websocket.Conn) {
 			return
 		}
 
-		thisMessage := Packet{}
+		thisPacket := Packet{}
 
-		unmarshalError := json.Unmarshal(msg, &thisMessage)
+		unmarshalError := json.Unmarshal(msg, &thisPacket)
 		if unmarshalError != nil {
 			log.Println("unmarshal error", unmarshalError)
 		}
 
-		if thisMessage.MsgType == 100 {
+		if thisPacket.Type == 100 {
 			log.Println("100: User is already logged in.")
 			conn.WriteMessage(1, []byte("You are already logged in."))
-		} else if thisMessage.MsgType == 200 {
+		} else if thisPacket.Type == 200 {
 			log.Println("200: this is a friend request")
 			conn.WriteMessage(1, []byte("friend request"))
-		} else if thisMessage.MsgType == 300 {
+		} else if thisPacket.Type == 300 {
 			log.Println("300: this is a normal chat message")
 			conn.WriteMessage(1, []byte("chat message"))
 		} else {

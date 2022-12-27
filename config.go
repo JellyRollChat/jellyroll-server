@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sync"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -65,8 +66,8 @@ var (
 // Packet is an object to encapsulate messages
 // Types: 100 friend request, 200 normal message user to user
 type Packet struct {
-	MsgType    int    `json:"msg_type"`
-	MsgContent string `json:"msg_content"`
+	Type    int    `json:"msg_type"`
+	Content string `json:"msg_content"`
 }
 
 type AuthObject struct {
@@ -75,10 +76,13 @@ type AuthObject struct {
 }
 
 type UserSession struct {
-	Username string              `json:"username"`
-	State    ClientStateExchange `json:"state"`
-	Conn     *websocket.Conn     `json:"conn"`
+	Username   string              `json:"username"`
+	State      ClientStateExchange `json:"state"`
+	Conn       *websocket.Conn     `json:"conn"`
+	Authorized bool                `json:"authorized"`
 }
+
+var mutex sync.Mutex
 
 // ClientMessage is a simple format for basic user<->user messages that are passed through a server
 type ClientMessage struct {

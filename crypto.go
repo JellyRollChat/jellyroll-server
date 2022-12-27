@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 
 	"crypto/ed25519"
 )
@@ -27,6 +28,12 @@ func initKeys() *ED25519Keys {
 	keys.privateKey = keysprivateKey[:64]
 	keys.signedKey = keyssignedKey[:64]
 	keys.selfCert = keysselfCert[:64]
+
+	fmt.Println("Server Pubkey:\t" + keys.publicKey[0:4] + "..  ./" + pubKeyFilePath)
+	fmt.Println("Server Privkey:\t" + keys.privateKey[0:4] + "..  ./" + privKeyFilePath)
+	fmt.Println("Server Sigkey:\t" + keys.signedKey[0:4] + "..  ./" + signedKeyFilePath)
+	fmt.Println("Server Cert:\t" + keys.selfCert[0:4] + "..  ./" + selfCertFilePath)
+
 	return &keys
 }
 
