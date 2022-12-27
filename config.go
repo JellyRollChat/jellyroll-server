@@ -38,20 +38,7 @@ var (
 		"X-Requested-With"}
 
 	corsOrigins = []string{
-		"127.0.0.1",
-		"3ck0.com",
-		"server.3ck0.com",
-		"http://127.0.0.1",
-		"http://3ck0.com",
-		"http://server.3ck0.com",
-		"http://localhost",
-		"http://127.0.0.1/",
-		"http://3ck0.com/",
-		"http://server.3ck0.com/",
-		"http://localhost/",
-		"127.0.0.1/",
-		"3ck0.com/",
-		"server.3ck0.com/",
+		"*",
 	}
 
 	corsMethods = []string{
