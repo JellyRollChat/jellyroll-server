@@ -13,8 +13,42 @@ import (
 
 func WebAPI() {
 
+	corsAllowedHeaders := []string{
+		"Access-Control-Allow-Headers",
+		"Access-Control-Allow-Methods",
+		"Access-Control-Allow-Origin",
+		"Cache-Control",
+		"Content-Security-Policy",
+		"Feature-Policy",
+		"Referrer-Policy",
+		"X-Requested-With"}
+
+	corsOrigins := []string{
+		"*",
+	}
+
+	corsMethods := []string{
+		"GET",
+		"HEAD",
+		"POST",
+		"PUT",
+		"OPTIONS",
+	}
+
+	headersCORS := handlers.AllowedHeaders(corsAllowedHeaders)
+	originsCORS := handlers.AllowedOrigins(corsOrigins)
+	methodsCORS := handlers.AllowedMethods(corsMethods)
+
 	log.Println("API launched")
 	api := mux.NewRouter()
+
+	api.Methods(http.MethodOptions).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.WriteHeader(http.StatusOK)
+	})
+
 	api.HandleFunc("/signup", SignupHandlerPOST).Methods(http.MethodPost)
 	api.HandleFunc("/signup/", SignupHandlerPOST).Methods(http.MethodPost)
 

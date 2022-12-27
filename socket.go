@@ -15,6 +15,31 @@ import (
 func SocketAPI(keyCollection *ED25519Keys) {
 
 	api := mux.NewRouter()
+	corsAllowedHeaders := []string{
+		"Access-Control-Allow-Headers",
+		"Access-Control-Allow-Methods",
+		"Access-Control-Allow-Origin",
+		"Cache-Control",
+		"Content-Security-Policy",
+		"Feature-Policy",
+		"Referrer-Policy",
+		"X-Requested-With"}
+
+	corsOrigins := []string{
+		"*",
+	}
+
+	corsMethods := []string{
+		"GET",
+		"HEAD",
+		"POST",
+		"PUT",
+		"OPTIONS",
+	}
+
+	headersCORS := handlers.AllowedHeaders(corsAllowedHeaders)
+	originsCORS := handlers.AllowedOrigins(corsOrigins)
+	methodsCORS := handlers.AllowedMethods(corsMethods)
 
 	// Channel Socket
 	api.HandleFunc("/talk", func(w http.ResponseWriter, r *http.Request) {
