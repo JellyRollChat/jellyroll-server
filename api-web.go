@@ -42,8 +42,8 @@ func WebAPI() {
 	log.Println("API launched")
 	api := mux.NewRouter()
 
-	api.HandleFunc("/signup", SignupHandlerPOST).Methods(http.MethodPost)
-	api.HandleFunc("/signup/", SignupHandlerPOST).Methods(http.MethodPost)
+	api.HandleFunc("/signup", SignupHandlerPOST).Methods(http.MethodPost, http.MethodOptions)
+	api.HandleFunc("/signup/", SignupHandlerPOST).Methods(http.MethodPost, http.MethodOptions)
 
 	http.ListenAndServe(":"+strconv.Itoa(webPort), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
 }
