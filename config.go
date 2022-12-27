@@ -28,14 +28,29 @@ var GlobalUserSessions = make(map[string]*UserSession)
 
 var (
 	corsAllowedHeaders = []string{
-		"*"}
+		"Access-Control-Allow-Headers",
+		"Access-Control-Allow-Methods",
+		"Access-Control-Allow-Origin",
+		"Cache-Control",
+		"Content-Security-Policy",
+		"Feature-Policy",
+		"Referrer-Policy",
+		"X-Requested-With"}
 
 	corsOrigins = []string{
 		"*",
+		"server.3ck0.com:5270",
+		"server.3ck0.com:5270/",
+		"127.0.0.1:5270/",
+		"127.0.0.1:5270/",
 	}
 
 	corsMethods = []string{
-		"*",
+		"GET",
+		"HEAD",
+		"POST",
+		"PUT",
+		"OPTIONS",
 	}
 
 	headersCORS = handlers.AllowedHeaders(corsAllowedHeaders)
