@@ -41,7 +41,13 @@ var (
 
 	corsOrigins = []string{
 		"*",
-		"127.0.0.1"}
+		"127.0.0.1",
+		"3ck0.com",
+		"server.3ck0.com",
+		"127.0.0.1/",
+		"3ck0.com/",
+		"server.3ck0.com/",
+	}
 
 	corsMethods = []string{
 		"GET",
