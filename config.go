@@ -44,6 +44,10 @@ var (
 		"127.0.0.1",
 		"3ck0.com",
 		"server.3ck0.com",
+		"http://127.0.0.1",
+		"http://3ck0.com",
+		"http://server.3ck0.com",
+		"http://localhost",
 		"127.0.0.1/",
 		"3ck0.com/",
 		"server.3ck0.com/",
@@ -54,7 +58,8 @@ var (
 		"HEAD",
 		"POST",
 		"PUT",
-		"OPTIONS"}
+		"OPTIONS",
+	}
 
 	headersCORS = handlers.AllowedHeaders(corsAllowedHeaders)
 	originsCORS = handlers.AllowedOrigins(corsOrigins)
