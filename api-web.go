@@ -30,18 +30,7 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	reportRequest("signup", w, r)
 
 	log.Println(r.Body)
-
 	thisSignup := AuthObject{}
-
-	// unmarshall json string to struct
-	err := json.NewDecoder(r.Body).Decode(&thisSignup)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	log.Println(thisSignup.Username)
-	log.Println(thisSignup.Password)
 
 	r.ParseForm()
 	for key, value := range r.Form {
@@ -53,31 +42,14 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// unmarshall json string to struct
+	err := json.NewDecoder(r.Body).Decode(&thisSignup)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	if !fileContainsString(thisSignup.Username, "admin/users.list") {
-
-		if len(thisSignup.Username) < 6 {
-			log.Println(brightred + "Username is too short " + nc)
-			fmt.Fprintf(w, "Username is too short ")
-			return
-		}
-
-		if len(thisSignup.Username) > 20 {
-			log.Println(brightred + "Username is too long " + nc)
-			fmt.Fprintf(w, "Username is too long ")
-			return
-		}
-
-		if len(thisSignup.Password) < 8 {
-			log.Println(brightred + "password is too short " + nc)
-			fmt.Fprintf(w, "Password is too short ")
-			return
-		}
-
-		if len(thisSignup.Password) > 120 {
-			log.Println(brightred + "password is too long " + nc)
-			fmt.Fprintf(w, "Password is too long ")
-			return
-		}
 
 		thisSignup.Password = hashit(thisSignup.Password)
 
@@ -93,16 +65,16 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		thisUser.Servertld = servertld
 		thisUser.Username = thisSignup.Username
 
-		fullusername := thisSignup.Username + "@" + servertld
+		// fullusername := thisSignup.Username + "@" + servertld
 
-		fmt.Fprintf(w, "{\"status\":\"success\",\"fullname\":\""+fullusername+"\"}")
+		fmt.Fprintf(w, "OK!")
 
 		log.Println(brightmagenta + "New User: " + magenta + thisSignup.Username + "@" + servertld)
 		// return
 
 	} else {
 		log.Println(brightred + "Username is not available " + nc)
-		fmt.Fprintf(w, "{\"status\":\"success\",\"fullname\":\"none\"}")
+		fmt.Fprintf(w, "DENIED!")
 
 		return
 	}

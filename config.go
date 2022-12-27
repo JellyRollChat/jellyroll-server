@@ -40,7 +40,7 @@ var (
 		"X-Requested-With"}
 
 	corsOrigins = []string{
-		// "*",
+		"*",
 		"127.0.0.1"}
 
 	corsMethods = []string{
