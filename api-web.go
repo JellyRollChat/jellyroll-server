@@ -49,10 +49,11 @@ func WebAPI() {
 			w.Header().Add("Access-Control-Allow-Headers", header)
 		}
 
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
+		// if r.Method == http.MethodOptions {
+
+		// 	w.WriteHeader(http.StatusOK)
+		// 	return
+		// }
 		http.DefaultServeMux.ServeHTTP(w, r)
 	}))
 }
