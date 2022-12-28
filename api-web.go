@@ -67,6 +67,7 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	log.Println("\n\n\nSignupHandler POST")
+	reportRequest("signup", w, r)
 	log.Println("Request headers:", r.Header)
 	parseerr := r.ParseForm()
 	if parseerr != nil {
@@ -74,7 +75,6 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Request body: ", r.Body)
 	log.Println("Request form:", r.Form)
-	reportRequest("signup", w, r)
 	thisSignup := AuthObject{}
 	log.Println("Ranging keys")
 	for key, value := range r.Form {
