@@ -63,36 +63,7 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("\n"+purple+r.Method+" "+brightgreen+"/%s"+white+" by "+brightcyan+"%s\n"+white+"Agent: "+cyan+"%s\n"+nc, name, r.RemoteAddr, userAgent)
 }
 
-// Send a preflight request to the remote server to check if the actual request is allowed
-func sendPreflight(w http.ResponseWriter, r *http.Request) {
-	preflightUrl := "http://server.3ck0.com:5270/signup"
-	preflightReq, err := http.NewRequest("OPTIONS", preflightUrl, nil)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Set headers for the preflight request
-	preflightReq.Header.Set("Access-Control-Request-Method", "POST")
-	preflightReq.Header.Set("Access-Control-Request-Headers", "Content-Type")
-
-	// Send the preflight request
-	client := &http.Client{}
-	preflightRes, err := client.Do(preflightReq)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer preflightRes.Body.Close()
-
-	// Check the response status code
-	if preflightRes.StatusCode != http.StatusOK {
-		http.Error(w, "Preflight request failed", http.StatusBadRequest)
-		return
-	}
-}
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
-	sendPreflight(w, r)
 	log.Println("SignupHandler POST")
 	log.Println("Request headers:", r.Header)
 	parseerr := r.ParseForm()
