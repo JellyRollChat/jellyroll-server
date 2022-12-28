@@ -60,13 +60,16 @@ func WebAPI() {
 		http.DefaultServeMux.ServeHTTP(w, r)
 	}))
 }
-
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
 func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 	userAgent := r.UserAgent()
 	fmt.Printf("\n"+purple+r.Method+" "+brightgreen+"/%s"+white+" by "+brightcyan+"%s\n"+white+"Agent: "+cyan+"%s\n"+nc, name, r.RemoteAddr, userAgent)
 }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	log.Println("Request headers:", r.Header)
 	log.Println("Request form:", r.Form)
 	reportRequest("signup", w, r)
