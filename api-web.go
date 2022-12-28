@@ -77,6 +77,8 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	// if parseerr != nil {
 	// 	log.Println("Form parse error on signup handler: ", parseerr)
 	// }
+	log.Println("username formvalue: ", r.FormValue("username"))
+	log.Println("password formvalue: ", r.FormValue("signupPassword"))
 	log.Println("Request form:", r.Form)
 	thisSignup := AuthObject{}
 	// log.Println("Ranging keys")
