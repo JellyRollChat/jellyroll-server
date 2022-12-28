@@ -51,7 +51,6 @@ func WebAPI() {
 
 		if r.Method == http.MethodOptions {
 			enableCors(&w)
-			return
 		}
 		http.DefaultServeMux.ServeHTTP(w, r)
 	}))
