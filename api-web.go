@@ -57,10 +57,6 @@ func WebAPI() {
 	}))
 }
 
-// func enableCors(w *http.ResponseWriter) {
-// 	(*w).Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:1430")
-// }
-
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -83,17 +79,17 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Request form:", r.Form)
 	thisSignup := AuthObject{}
-	log.Println("Ranging keys")
-	for key, value := range r.Form {
-		log.Println("Key: ", key)
-		log.Println("value: ", value)
-		log.Println("key: ", key, "value: ", value)
-		if key == "username" {
-			thisSignup.Username = sanitizeString(value[0], 20)
-		} else if key == "signupPassword" {
-			thisSignup.Password = value[0]
-		}
-	}
+	// log.Println("Ranging keys")
+	// for key, value := range r.Form {
+	// 	log.Println("Key: ", key)
+	// 	log.Println("value: ", value)
+	// 	log.Println("key: ", key, "value: ", value)
+	// 	if key == "username" {
+	thisSignup.Username = sanitizeString(r.FormValue("username"), 20)
+	// } else if key == "signupPassword" {
+	thisSignup.Password = r.FormValue("signupPassword")
+	// }
+	// }
 	log.Println("request body: ", r.Body)
 	err := json.NewDecoder(r.Body).Decode(&thisSignup)
 	if err != nil {
