@@ -25,6 +25,7 @@ func WebAPI() {
 
 	corsOrigins := []string{
 		"*",
+		"http://127.0.0.1:1430",
 	}
 
 	corsMethods := []string{
