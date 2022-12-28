@@ -16,6 +16,7 @@ func WebAPI() {
 		"Access-Control-Allow-Origin",
 		"Cache-Control",
 		"Content-Security-Policy",
+		"Content-"
 		"Feature-Policy",
 		"Referrer-Policy",
 		"X-Requested-With"}
@@ -24,7 +25,7 @@ func WebAPI() {
 		"server.3ck0.com:5270/signup",
 		"http://server.3ck0.com:5270/signup",
 		"http://127.0.0.1:1430",
-		"127.0.0.1:1430",
+		"138.199.43.75:1430",
 	}
 
 	corsMethods := []string{
