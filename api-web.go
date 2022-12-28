@@ -66,7 +66,7 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
-	log.Println("SignupHandler POST")
+	log.Println("\n\n\nSignupHandler POST")
 	log.Println("Request headers:", r.Header)
 	parseerr := r.ParseForm()
 	if parseerr != nil {
