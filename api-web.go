@@ -67,6 +67,7 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	log.Println("SignupHandler POST")
 	log.Println("Request headers:", r.Header)
 	r.ParseForm()
+	log.Println(r.Body)
 	log.Println("Request form:", r.Form)
 	reportRequest("signup", w, r)
 	thisSignup := AuthObject{}
