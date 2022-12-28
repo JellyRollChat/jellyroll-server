@@ -69,11 +69,10 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	log.Println("\n\n\nSignupHandler POST")
 	reportRequest("signup", w, r)
 	log.Println("Request headers:", r.Header)
-	parseerr := r.ParseForm()
+	parseerr := r.PostForm
 	if parseerr != nil {
 		log.Println("Form parse error on signup handler: ", parseerr)
 	}
-	log.Println("Request body: ", r.Body)
 	log.Println("Request form:", r.Form)
 	thisSignup := AuthObject{}
 	log.Println("Ranging keys")
