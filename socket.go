@@ -7,14 +7,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
 
 func SocketAPI(keyCollection *ED25519Keys) {
-
-	api := mux.NewRouter()
 	corsAllowedHeaders := []string{
 		"Access-Control-Allow-Headers",
 		"Access-Control-Allow-Methods",
@@ -37,9 +34,7 @@ func SocketAPI(keyCollection *ED25519Keys) {
 		"OPTIONS",
 	}
 
-	headersCORS := handlers.AllowedHeaders(corsAllowedHeaders)
-	originsCORS := handlers.AllowedOrigins(corsOrigins)
-	methodsCORS := handlers.AllowedMethods(corsMethods)
+	api := mux.NewRouter()
 
 	// Channel Socket
 	api.HandleFunc("/talk", func(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +46,24 @@ func SocketAPI(keyCollection *ED25519Keys) {
 	})
 
 	// Serve via HTTP
-	http.ListenAndServe(":"+strconv.Itoa(clientCommPort), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
+
+	http.ListenAndServe(":"+strconv.Itoa(clientCommPort), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for _, origin := range corsOrigins {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
+		for _, method := range corsMethods {
+			w.Header().Add("Access-Control-Allow-Methods", method)
+		}
+		for _, header := range corsAllowedHeaders {
+			w.Header().Add("Access-Control-Allow-Headers", header)
+		}
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		http.DefaultServeMux.ServeHTTP(w, r)
+	}))
 }
 
 func socketHandler(conn *websocket.Conn, keyCollection *ED25519Keys) {
@@ -131,7 +143,8 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 		log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
 		authdSocketMsgWriter(conn)
 	} else {
-		conn.WriteMessage(1, []byte("NO!"))
+		log.Println("User does not exist in user list")
+		conn.WriteMessage(1, []byte("Access Denied. Goodbye!"))
 		conn.Close()
 	}
 

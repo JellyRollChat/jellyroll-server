@@ -6,9 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 )
 
 func WebAPI() {
@@ -24,7 +21,12 @@ func WebAPI() {
 		"X-Requested-With"}
 
 	corsOrigins := []string{
-		"http://127.0.0.1:1430",
+		"*",
+		"server.3ck0.com",
+		"127.0.0.1",
+		"http://*",
+		"http://server.3ck0.com",
+		"http://127.0.0.1",
 	}
 
 	corsMethods := []string{
@@ -35,17 +37,28 @@ func WebAPI() {
 		"OPTIONS",
 	}
 
-	headersCORS := handlers.AllowedHeaders(corsAllowedHeaders)
-	originsCORS := handlers.AllowedOrigins(corsOrigins)
-	methodsCORS := handlers.AllowedMethods(corsMethods)
-
 	log.Println("API launched")
-	api := mux.NewRouter()
 
-	api.HandleFunc("/signup", SignupHandlerPOST).Methods(http.MethodPost, http.MethodOptions)
-	api.HandleFunc("/signup/", SignupHandlerPOST).Methods(http.MethodPost, http.MethodOptions)
+	http.HandleFunc("/signup", SignupHandlerPOST)
+	http.HandleFunc("/signup/", SignupHandlerPOST)
 
-	http.ListenAndServe(":"+strconv.Itoa(webPort), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
+	http.ListenAndServe(":"+strconv.Itoa(webPort), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for _, origin := range corsOrigins {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
+		for _, method := range corsMethods {
+			w.Header().Add("Access-Control-Allow-Methods", method)
+		}
+		for _, header := range corsAllowedHeaders {
+			w.Header().Add("Access-Control-Allow-Headers", header)
+		}
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		http.DefaultServeMux.ServeHTTP(w, r)
+	}))
 }
 
 func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
@@ -54,16 +67,6 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1")
-		w.Header().Set("Access-Control-Allow-Methods", "POST")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		// w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-	w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1")
-	// w.Header().Set("Access-Control-Allow-Credentials", "true")
 	log.Println("Request headers:", r.Header)
 	log.Println("Request form:", r.Form)
 	reportRequest("signup", w, r)
@@ -93,9 +96,9 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		thisUser.Servertld = servertld
 		thisUser.Username = thisSignup.Username
 		fmt.Fprintf(w, "OK!")
-		log.Println(brightmagenta + "New User: " + magenta + thisSignup.Username + "@" + servertld)
+		log.Println("New User: " + thisSignup.Username + "@" + servertld)
 	} else {
-		log.Println(brightred + "Username is not available " + nc)
+		log.Println("Username is not available")
 		fmt.Fprintf(w, "DENIED!")
 		return
 	}
