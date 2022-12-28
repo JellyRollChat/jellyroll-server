@@ -21,8 +21,8 @@ func WebAPI() {
 		"X-Requested-With"}
 
 	corsOrigins := []string{
-		"server.3ck0.com:5270",
-		"http://server.3ck0.com:5270",
+		"server.3ck0.com:5270/signup",
+		"http://server.3ck0.com:5270/signup",
 	}
 
 	corsMethods := []string{
@@ -57,7 +57,7 @@ func WebAPI() {
 	}))
 }
 func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "http://server.3ck0.com")
+	(*w).Header().Set("Access-Control-Allow-Origin", "http://server.3ck0.com:5270/signup")
 }
 func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 	userAgent := r.UserAgent()
