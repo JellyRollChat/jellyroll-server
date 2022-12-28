@@ -16,7 +16,7 @@ func WebAPI() {
 		"Access-Control-Allow-Origin",
 		"Cache-Control",
 		"Content-Security-Policy",
-		"Content-"
+		"Content-Type",
 		"Feature-Policy",
 		"Referrer-Policy",
 		"X-Requested-With"}
