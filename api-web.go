@@ -22,10 +22,9 @@ func WebAPI() {
 		"X-Requested-With"}
 
 	corsOrigins := []string{
-		"server.3ck0.com:5270/signup",
 		"http://server.3ck0.com:5270/signup",
 		"http://127.0.0.1:1430",
-		"138.199.43.75:1430",
+		"http://138.199.43.75:1430",
 	}
 
 	corsMethods := []string{
