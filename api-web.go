@@ -24,7 +24,6 @@ func WebAPI() {
 		"X-Requested-With"}
 
 	corsOrigins := []string{
-		"*",
 		"http://127.0.0.1:1430",
 	}
 
@@ -56,13 +55,15 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1")
 		w.Header().Set("Access-Control-Allow-Methods", "POST")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		// w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1")
+	// w.Header().Set("Access-Control-Allow-Credentials", "true")
 	log.Println("Request headers:", r.Header)
 	log.Println("Request form:", r.Form)
 	reportRequest("signup", w, r)
