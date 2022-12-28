@@ -66,10 +66,10 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	log.Println("SignupHandler POST")
 	log.Println("Request headers:", r.Header)
+	r.ParseForm()
 	log.Println("Request form:", r.Form)
 	reportRequest("signup", w, r)
 	thisSignup := AuthObject{}
-	r.ParseForm()
 	for key, value := range r.Form {
 		log.Println("key: ", key, "value: ", value)
 		if key == "username" {
