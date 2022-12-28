@@ -58,7 +58,7 @@ func WebAPI() {
 	}))
 }
 func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "http://server.3ck0.com:5270/signup")
+	(*w).Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:5270/signup")
 }
 func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 	userAgent := r.UserAgent()
