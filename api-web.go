@@ -49,11 +49,10 @@ func WebAPI() {
 			w.Header().Add("Access-Control-Allow-Headers", header)
 		}
 
-		// if r.Method == http.MethodOptions {
-
-		// 	w.WriteHeader(http.StatusOK)
-		// 	return
-		// }
+		if r.Method == http.MethodOptions {
+			enableCors(&w)
+			return
+		}
 		http.DefaultServeMux.ServeHTTP(w, r)
 	}))
 }
@@ -66,7 +65,6 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
-	enableCors(&w)
 	log.Println("SignupHandler POST")
 	log.Println("Request headers:", r.Header)
 	log.Println("Request form:", r.Form)
