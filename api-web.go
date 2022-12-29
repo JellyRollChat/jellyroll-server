@@ -82,23 +82,23 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		log.Println("Form parse error on signup handler: ", parseerr)
 	}
 	thisSignup := AuthObject{}
-	for key, value := range r.Form {
-		log.Println("Key: ", key)
-		log.Println("value: ", value)
-		log.Println("key: ", key, "value: ", value)
-		if key == "username" {
-			thisSignup.Username = sanitizeString(value[0], 20)
-		} else if key == "signupPassword" {
-			thisSignup.Password = value[0]
-		}
-	}
+	// for key, value := range r.Form {
+	// 	log.Println("Key: ", key)
+	// 	log.Println("value: ", value)
+	// 	log.Println("key: ", key, "value: ", value)
+	// 	if key == "username" {
+	// 		thisSignup.Username = sanitizeString(value[0], 20)
+	// 	} else if key == "signupPassword" {
+	// 		thisSignup.Password = value[0]
+	// 	}
+	// }
 	err := json.NewDecoder(r.Body).Decode(&thisSignup)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if !fileContainsString(thisSignup.Username, "admin/users.list") {
-		thisSignup.Password = hashit(thisSignup.Password)
+		// thisSignup.Password = hashit(thisSignup.Password)
 		appendFile("admin/users.list", thisSignup.Username+"@"+servertld+","+thisSignup.Password+"\n")
 		type userInfo struct {
 			Username  string
@@ -114,5 +114,5 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "DENIED!")
 		return
 	}
-	log.Println("Response headers:", w.Header())
+	// log.Println("Response headers:", w.Header())
 }
