@@ -74,6 +74,12 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
+    // Check the request method, IBMCD said do this.
+    if r.Method == http.MethodOptions {
+			// If the method is OPTIONS, return an HTTP 200 status code
+			w.WriteHeader(http.StatusOK)
+			return
+	}
 	log.Println("\n\n\nSignupHandler POST")
 	reportRequest("signup", w, r)
 	log.Println("Request headers:", r.Header)
