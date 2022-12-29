@@ -76,16 +76,12 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	log.Println("\n\n\nSignupHandler POST")
 	reportRequest("signup", w, r)
-	log.Println("Request headers:", r.Header)
 	parseerr := r.ParseForm()
 	if parseerr != nil {
 		log.Println("Form parse error on signup handler: ", parseerr)
 	}
-	log.Println("Request form:", r.Form)
 	thisSignup := AuthObject{}
-	log.Println("Ranging keys")
 	for key, value := range r.Form {
 		log.Println("Key: ", key)
 		log.Println("value: ", value)
@@ -96,7 +92,6 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 			thisSignup.Password = value[0]
 		}
 	}
-	log.Println("request body: ", r.Body)
 	err := json.NewDecoder(r.Body).Decode(&thisSignup)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
