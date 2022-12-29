@@ -92,6 +92,7 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	// 		thisSignup.Password = value[0]
 	// 	}
 	// }
+	log.Println("Heres the body", r.Body)
 	err := json.NewDecoder(r.Body).Decode(&thisSignup)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
