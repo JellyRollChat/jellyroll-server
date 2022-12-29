@@ -82,16 +82,6 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		log.Println("Form parse error on signup handler: ", parseerr)
 	}
 	thisSignup := AuthObject{}
-	// for key, value := range r.Form {
-	// 	log.Println("Key: ", key)
-	// 	log.Println("value: ", value)
-	// 	log.Println("key: ", key, "value: ", value)
-	// 	if key == "username" {
-	// 		thisSignup.Username = sanitizeString(value[0], 20)
-	// 	} else if key == "signupPassword" {
-	// 		thisSignup.Password = value[0]
-	// 	}
-	// }
 	log.Println("Heres the body", r.Body)
 	err := json.NewDecoder(r.Body).Decode(&thisSignup)
 	if err != nil {
@@ -99,20 +89,12 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !fileContainsString(thisSignup.Username, "admin/users.list") {
-		// thisSignup.Password = hashit(thisSignup.Password)
 		appendFile("admin/users.list", thisSignup.Username+"@"+servertld+","+thisSignup.Password+"\n")
-		type userInfo struct {
-			Username  string
-			Servertld string
-		}
-		thisUser := userInfo{}
-		thisUser.Servertld = servertld
-		thisUser.Username = thisSignup.Username
 		fmt.Fprintf(w, "\"OK\"")
 		log.Println("New User: " + thisSignup.Username + "@" + servertld)
 	} else {
 		log.Println("Username is not available")
-		fmt.Fprintf(w, "DENIED!")
+		fmt.Fprintf(w, "\"ERROR\"")
 		return
 	}
 	// log.Println("Response headers:", w.Header())
