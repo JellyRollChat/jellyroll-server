@@ -70,9 +70,7 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
-	// Check the request method
 	if r.Method == http.MethodOptions {
-		// If the method is OPTIONS, return an ok
 		w.WriteHeader(http.StatusOK)
 		return
 	}
