@@ -95,5 +95,4 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "\"ERROR\"")
 		return
 	}
-	// log.Println("Response headers:", w.Header())
 }
