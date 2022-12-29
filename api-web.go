@@ -80,7 +80,6 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		log.Println("Form parse error on signup handler: ", parseerr)
 	}
 	thisSignup := AuthObject{}
-	log.Println("Heres the body", r.Body)
 	err := json.NewDecoder(r.Body).Decode(&thisSignup)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
