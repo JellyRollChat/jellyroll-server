@@ -112,7 +112,7 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		thisUser := userInfo{}
 		thisUser.Servertld = servertld
 		thisUser.Username = thisSignup.Username
-		fmt.Fprintf(w, "\"OK!\"")
+		fmt.Fprintf(w, "OK")
 		log.Println("New User: " + thisSignup.Username + "@" + servertld)
 	} else {
 		log.Println("Username is not available")
