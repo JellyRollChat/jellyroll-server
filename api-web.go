@@ -70,9 +70,9 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
-	// Check the request method, IBMCD said do this.
+	// Check the request method
 	if r.Method == http.MethodOptions {
-		// If the method is OPTIONS, return an HTTP 200 status code
+		// If the method is OPTIONS, return an ok
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -112,7 +112,7 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		thisUser := userInfo{}
 		thisUser.Servertld = servertld
 		thisUser.Username = thisSignup.Username
-		fmt.Fprintf(w, "OK")
+		fmt.Fprintf(w, "\"OK\"")
 		log.Println("New User: " + thisSignup.Username + "@" + servertld)
 	} else {
 		log.Println("Username is not available")
