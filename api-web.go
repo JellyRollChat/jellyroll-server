@@ -89,11 +89,18 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	}
 	if !fileContainsString(thisSignup.Username, "admin/users.list") {
 		appendFile("admin/users.list", thisSignup.Username+"@"+servertld+","+thisSignup.Password+"\n")
-		fmt.Fprintf(w, "\"OK\"")
+		okJSON, okJSONerr := json.Marshal("OK")
+		if okJSONerr != nil {
+			log.Println("Error marshalling OK response: ", okJSONerr)
+		}
+		fmt.Fprint(w, string(okJSON))
 		log.Println("New User: " + thisSignup.Username + "@" + servertld)
 	} else {
-		log.Println("Username is not available")
-		fmt.Fprintf(w, "\"ERROR\"")
+		erJSON, erJSONerr := json.Marshal("OK")
+		if erJSONerr != nil {
+			log.Println("Error marshalling error response: ", erJSONerr)
+		}
+		fmt.Fprint(w, string(erJSON))
 		return
 	}
 }
