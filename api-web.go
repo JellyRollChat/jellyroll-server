@@ -57,10 +57,6 @@ func WebAPI() {
 	}))
 }
 
-// func enableCors(w *http.ResponseWriter) {
-// 	(*w).Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:1430")
-// }
-
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:1430")
 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -74,33 +70,17 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
-	// Check the request method, IBMCD said do this.
 	if r.Method == http.MethodOptions {
-		// If the method is OPTIONS, return an HTTP 200 status code
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	log.Println("\n\n\nSignupHandler POST")
 	reportRequest("signup", w, r)
-	log.Println("Request headers:", r.Header)
 	parseerr := r.ParseForm()
 	if parseerr != nil {
 		log.Println("Form parse error on signup handler: ", parseerr)
 	}
-	log.Println("Request form:", r.Form)
 	thisSignup := AuthObject{}
-	log.Println("Ranging keys")
-	for key, value := range r.Form {
-		log.Println("Key: ", key)
-		log.Println("value: ", value)
-		log.Println("key: ", key, "value: ", value)
-		if key == "username" {
-			thisSignup.Username = sanitizeString(value[0], 20)
-		} else if key == "signupPassword" {
-			thisSignup.Password = value[0]
-		}
-	}
-	log.Println("request body: ", r.Body)
+
 	err := json.NewDecoder(r.Body).Decode(&thisSignup)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
