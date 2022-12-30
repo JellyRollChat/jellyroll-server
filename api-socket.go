@@ -139,6 +139,7 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 func (s *UserSession) Listen() {
 	mutex.Lock()
 	defer mutex.Unlock()
+	defer RemoveUserSession(s.Username)
 	if s.Conn != nil {
 		return
 	}
