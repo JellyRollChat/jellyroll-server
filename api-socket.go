@@ -7,11 +7,14 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
 
 func SocketAPI(keyCollection *ED25519Keys) {
+
+	api := mux.NewRouter()
 	corsAllowedHeaders := []string{
 		"Access-Control-Allow-Headers",
 		"Access-Control-Allow-Methods",
@@ -34,11 +37,12 @@ func SocketAPI(keyCollection *ED25519Keys) {
 		"OPTIONS",
 	}
 
-	api := mux.NewRouter()
+	headersCORS := handlers.AllowedHeaders(corsAllowedHeaders)
+	originsCORS := handlers.AllowedOrigins(corsOrigins)
+	methodsCORS := handlers.AllowedMethods(corsMethods)
 
 	// Channel Socket
 	api.HandleFunc("/talk", func(w http.ResponseWriter, r *http.Request) {
-		reportRequest("talk", w, r)
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		conn, _ := upgrader.Upgrade(w, r, nil)
 		defer conn.Close()
@@ -47,24 +51,7 @@ func SocketAPI(keyCollection *ED25519Keys) {
 	})
 
 	// Serve via HTTP
-
-	http.ListenAndServe(":"+strconv.Itoa(clientCommPort), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		for _, origin := range corsOrigins {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-		}
-		for _, method := range corsMethods {
-			w.Header().Add("Access-Control-Allow-Methods", method)
-		}
-		for _, header := range corsAllowedHeaders {
-			w.Header().Add("Access-Control-Allow-Headers", header)
-		}
-
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		http.DefaultServeMux.ServeHTTP(w, r)
-	}))
+	http.ListenAndServe(":"+strconv.Itoa(clientCommPort), handlers.CORS(headersCORS, originsCORS, methodsCORS)(api))
 }
 
 func socketHandler(conn *websocket.Conn, keyCollection *ED25519Keys) {
