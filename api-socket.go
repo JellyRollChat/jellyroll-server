@@ -95,6 +95,7 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 			thisSession.State = ClientStateExchange{
 				CurrentFriends: []string{
 					"esp@3ck0.com",
+					"fred@server.3ck0.com",
 				},
 				PendingFriends: []string{},
 				BlockedFriends: []string{},
