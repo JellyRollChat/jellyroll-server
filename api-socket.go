@@ -38,6 +38,7 @@ func SocketAPI(keyCollection *ED25519Keys) {
 
 	// Channel Socket
 	api.HandleFunc("/talk", func(w http.ResponseWriter, r *http.Request) {
+		reportRequest("talk", w, r)
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		conn, _ := upgrader.Upgrade(w, r, nil)
 		defer conn.Close()
@@ -67,7 +68,6 @@ func SocketAPI(keyCollection *ED25519Keys) {
 }
 
 func socketHandler(conn *websocket.Conn, keyCollection *ED25519Keys) {
-
 	defer conn.Close()
 	_, msg, err := conn.ReadMessage()
 	if err != nil {
@@ -186,17 +186,6 @@ func (s *UserSession) Listen() {
 	}
 }
 
-// AddUserSession adds a new user session to the global map
-func AddUserSession(s *UserSession) {
-	GlobalUserSessions[s.Username] = s
-	go s.Listen()
-}
-
-// RemoveUserSession removes a user session from the global map
-func RemoveUserSession(username string) {
-	delete(GlobalUserSessions, username)
-}
-
 func authdSocketMsgWriter(conn *websocket.Conn) {
 
 	for {
@@ -230,4 +219,15 @@ func authdSocketMsgWriter(conn *websocket.Conn) {
 
 	}
 
+}
+
+// AddUserSession adds a new user session to the global map
+func AddUserSession(s *UserSession) {
+	GlobalUserSessions[s.Username] = s
+	go s.Listen()
+}
+
+// RemoveUserSession removes a user session from the global map
+func RemoveUserSession(username string) {
+	delete(GlobalUserSessions, username)
 }
