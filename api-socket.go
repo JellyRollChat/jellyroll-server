@@ -129,9 +129,20 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 
 			thisFile := readFile("admin/users/" + userpass[0] + ".state")
 			unmarshErr := json.Unmarshal([]byte(thisFile), &thisSession.State)
+			for _, r := range thisSession.State.CurrentFriends {
+				log.Println("Online? ", r)
+				for _, rr := range GlobalUserSessions {
+					log.Println("Checking: ", rr)
+					if rr.Username == r {
+						r = "(" + r + ")"
+						log.Println("Match found! ", r)
+					}
+				}
+			}
 			if unmarshErr != nil {
 				log.Println("Unmarshal error: " + unmarshErr.Error())
 			}
+
 			conn.WriteMessage(1, []byte(thisFile))
 		}
 		// log.Println(msg.Content)
