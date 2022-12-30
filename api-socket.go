@@ -125,7 +125,6 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 		}
 		// log.Println(msg.Content)
 		// log.Println("User exists in user list")
-		conn.WriteMessage(1, []byte("OK!"))
 		AddUserSession(&thisSession)
 		log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
 		authdSocketMsgWriter(conn)
