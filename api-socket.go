@@ -100,6 +100,16 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 				BlockedFriends: []string{},
 				BlockedServers: []string{},
 			}
+			for _, r := range thisSession.State.CurrentFriends {
+				log.Println("Online? ", r)
+				for _, rr := range GlobalUserSessions {
+					log.Println("Checking: ", rr)
+					if rr.Username == r {
+						r = "(" + r + ")"
+						log.Println("Match found! ", r)
+					}
+				}
+			}
 			marshalState, msErr := json.Marshal(thisSession.State)
 			if msErr != nil {
 				log.Println("Marshal Error: " + msErr.Error())
