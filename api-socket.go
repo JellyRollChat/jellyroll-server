@@ -150,8 +150,8 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 		AddUserSession(&thisSession)
 		log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
 		log.Println("Users online: ")
-		for _, session := range GlobalUserSessions {
-			fmt.Printf(session.Username + " ")
+		for i, session := range GlobalUserSessions {
+			fmt.Printf(i + " " + session.Username + " ")
 		}
 
 		authdSocketMsgWriter(conn)
