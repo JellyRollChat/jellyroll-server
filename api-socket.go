@@ -180,6 +180,8 @@ func authdSocketMsgWriter(conn *websocket.Conn) {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Printf(brightyellow+"\n[%s] [%s] Peer disconnected\n"+white, timeStamp(), conn.RemoteAddr())
+			log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
+
 			return
 		}
 
