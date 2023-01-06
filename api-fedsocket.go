@@ -122,15 +122,7 @@ func (f *FedServer) Listen() {
 					Timestamp:          time.Now(), // You can set the Timestamp field to the current time
 					SenderServerURL:    "",         // SenderServerURL field can be left empty
 					RecipientServerURL: "",         // RecipientServerURL field can be left empty
-					Content: Packet{
-						Type: 300,
-						Content: ClientMessage{
-							Timestamp: time.Now().Unix(),
-							From:      "server",
-							Recv:      msg.SenderID,
-							Body:      "User is currently offline",
-						},
-					},
+					Content:            "",
 				})
 
 				if err != nil {
