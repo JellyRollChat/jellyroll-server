@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -98,21 +99,49 @@ func (f *FedServer) Listen() {
 	for {
 		select {
 		case msg := <-f.Inbox:
-			// Process the message and send it to the appropriate user
-			user, ok := GlobalUserSessions[msg.RecipientID]
-			if !ok {
-				log.Println("error: recipient user not found")
+			// Check if the message is intended for this server
+			if msg.RecipientServerURL != servertld {
+				log.Println("error: message intended for different server")
 				continue
 			}
-			user.Inbox <- msg
-		case msg := <-f.Outbox:
-			// Send the message to the recipient server
-			server, ok := GlobalFedServers[msg.RecipientServerURL]
+
+			// Check if the user has an active session
+			userSession, ok := GlobalUserSessions[msg.RecipientID]
 			if !ok {
-				log.Println("error: recipient server not found")
+				// If the user doesn't have an active session, check if they exist in users.list
+				if ok := stringExistsInFile(msg.RecipientID); !ok {
+					log.Println("error: recipient user not found")
+					continue
+				}
+
+				// If the user exists in users.list, send a message indicating that the user is offline
+				err := f.Websocket.WriteJSON(&FedMessage{
+					ID:                 "", // ID field can be left empty
+					SenderID:           servertld,
+					RecipientID:        msg.SenderID,
+					Timestamp:          time.Now(), // You can set the Timestamp field to the current time
+					SenderServerURL:    "",         // SenderServerURL field can be left empty
+					RecipientServerURL: "",         // RecipientServerURL field can be left empty
+					Content: Packet{
+						Type: 300,
+						Content: ClientMessage{
+							Timestamp: time.Now().Unix(),
+							From:      "server",
+							Recv:      msg.SenderID,
+							Body:      "User is currently offline",
+						},
+					},
+				})
+
+				if err != nil {
+					log.Println("error sending message to sender:", err)
+					continue
+				}
 				continue
 			}
-			server.Websocket.WriteJSON(msg)
+
+			// If the user has an active session, add the message to their Inbox channel
+			userSession.Inbox <- msg
 		}
 	}
 }
