@@ -187,10 +187,9 @@ func stringExistsInFile(thisString string) bool {
 	return false
 }
 
-func splitAddress(address string) (username, serverURL string) {
-	parts := strings.Split(address, "@")
+func splitAddress(addr string) (string, string) {
+	parts := strings.Split(addr, "@")
 	if len(parts) != 2 {
-		log.Printf("Error: invalid address format %s\n", address)
 		return "", ""
 	}
 	return parts[0], parts[1]

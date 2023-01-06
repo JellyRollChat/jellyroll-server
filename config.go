@@ -10,6 +10,7 @@ import (
 const (
 	webPort        = 5270
 	clientCommPort = 5267
+	fedCommPort    = 5264
 
 	servertld = "server.3ck0.com"
 
@@ -49,13 +50,22 @@ type MessageHistoryEntry struct {
 	Message   string `json:"message"`
 }
 
-// UserSession struct represents a session for a user. It has five fields: a string Username representing the username of the user, a ClientStateExchange State representing the current state of the user's client, a pointer to a websocket connection Conn representing the connection to the user's client, a bool Authorized representing whether the user is authorized to use the service, and a slice of MessageHistoryEntry structs History representing the message history for the user.
+// UserSession struct represents a session for a user in a messaging system. It has seven fields:
+// Username: a string representing the username of the user
+// State: a ClientStateExchange object representing the current state of the user's client
+// Conn: a pointer to a websocket connection representing the connection to the user's client
+// Authorized: a bool representing whether the user is authorized to use the service
+// History: a slice of MessageHistoryEntry structs representing the message history for the user
+// Inbox: a channel for incoming messages for the user
+// Outbox: a channel for outgoing messages from the user
 type UserSession struct {
 	Username   string                `json:"username"`
 	State      ClientStateExchange   `json:"state"`
 	Conn       *websocket.Conn       `json:"conn"`
 	Authorized bool                  `json:"authorized"`
 	History    []MessageHistoryEntry `json:"history"`
+	Inbox      chan *FedMessage      `json:"inbox"`
+	Outbox     chan *FedMessage      `json:"outbox"`
 }
 
 var mutex sync.Mutex
