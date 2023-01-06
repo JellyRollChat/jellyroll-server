@@ -94,10 +94,13 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 			createFile("admin/users/" + userpass[0] + ".state")
 			thisSession.State = ClientStateExchange{
 				CurrentFriends: []string{
-					"esp@3ck0.com",
+					"esp@server.3ck0.com",
 					"fred@server.3ck0.com",
 				},
-				PendingFriends: []string{},
+				PendingFriends: []string{
+					"wanda@cool.yachts",
+					"mark@white.monster",
+				},
 				BlockedFriends: []string{},
 				BlockedServers: []string{},
 			}
@@ -183,7 +186,6 @@ func (s *UserSession) Listen() {
 			log.Println("error unmarshalling message body:", err)
 			continue
 		}
-		log.Println(packet)
 		switch packet.Type {
 		case 100:
 			if s.Authorized {
@@ -191,13 +193,142 @@ func (s *UserSession) Listen() {
 				log.Println("User is already logged in")
 			}
 		case 200:
-			log.Println("200: this is a friend request")
+			handleFriendRequest(msg, s)
+		case 201:
+			handleFriendApproval(msg, s)
+		case 202:
+			handleFriendDenial(msg, s)
 		case 300:
-			log.Println("300: this is a normal chat message")
+			handleChatMessage(msg, s)
 		default:
 			log.Println("???: I didn't understand this message")
 		}
+
 	}
+}
+
+func handleChatMessage(msg ClientMessage, s *UserSession) {
+	// Check if the recipient is a current friend
+	found := false
+	for _, friend := range s.State.CurrentFriends {
+		if friend == msg.Recv {
+			found = true
+			break
+		}
+	}
+	if !found {
+		log.Println("error: user cannot send message to non-friend")
+		return
+	}
+	// Update the sender's message history
+	s.History = append(s.History, MessageHistoryEntry{
+		Timestamp: msg.Timestamp,
+		Message:   fmt.Sprintf("Message to %s: %s", msg.Recv, msg.Body),
+	})
+	// Update the recipient's message history
+	recipientSession, ok := GlobalUserSessions[msg.Recv]
+	if ok {
+		recipientSession.History = append(recipientSession.History, MessageHistoryEntry{
+			Timestamp: msg.Timestamp,
+			Message:   fmt.Sprintf("Message from %s: %s", msg.From, msg.Body),
+		})
+	}
+	// Store the updated user state in the database
+	storeUserStateJSON(s.Username, s.State)
+
+}
+
+func handleFriendDenial(msg ClientMessage, s *UserSession) {
+	log.Println("202: this is a friend denial")
+	// Check if the user has the pending friend in their list
+	var pendingIndex int
+	found := false
+	for i, pendingFriend := range s.State.PendingFriends {
+		if pendingFriend == msg.From {
+			found = true
+			pendingIndex = i
+			break
+		}
+	}
+	if !found {
+		log.Println("error: user does not have pending friend in their list")
+		return
+	}
+
+	// Remove the pending friend from the pending friends list
+	s.State.PendingFriends = append(s.State.PendingFriends[:pendingIndex], s.State.PendingFriends[pendingIndex+1:]...)
+	s.History = append(s.History, MessageHistoryEntry{
+		Timestamp: msg.Timestamp,
+		Message:   fmt.Sprintf("Friend request from %s denied", msg.From),
+	})
+
+	// Update the recipient's message history
+	recipientSession, ok := GlobalUserSessions[msg.Recv]
+	if ok {
+		recipientSession.History = append(recipientSession.History, MessageHistoryEntry{
+			Timestamp: msg.Timestamp,
+			Message:   fmt.Sprintf("Friend request to %s denied", msg.Recv),
+		})
+	}
+	// Store the updated user state in the database
+	storeUserStateJSON(s.Username, s.State)
+}
+
+func handleFriendApproval(msg ClientMessage, s *UserSession) {
+	// Check if the user has the pending friend in their list
+	var pendingIndex int
+	found := false
+	for i, pendingFriend := range s.State.PendingFriends {
+		if pendingFriend == msg.From {
+			found = true
+			pendingIndex = i
+			break
+		}
+	}
+	if !found {
+		log.Println("error: user does not have pending friend in their list")
+		return
+	}
+	// Remove the pending friend from the pending friends list
+	s.State.PendingFriends = append(s.State.PendingFriends[:pendingIndex], s.State.PendingFriends[pendingIndex+1:]...)
+	// Add the approved friend to the current friends list
+	s.State.CurrentFriends = append(s.State.CurrentFriends, msg.From)
+	s.History = append(s.History, MessageHistoryEntry{
+		Timestamp: msg.Timestamp,
+		Message:   fmt.Sprintf("Friend request from %s approved", msg.From),
+	})
+
+	// Update the recipient's message history
+	recipientSession, ok := GlobalUserSessions[msg.Recv]
+	if ok {
+		recipientSession.State.CurrentFriends = append(recipientSession.State.CurrentFriends, msg.From)
+		recipientSession.History = append(recipientSession.History, MessageHistoryEntry{
+			Timestamp: msg.Timestamp,
+			Message:   fmt.Sprintf("Friend request to %s approved", msg.Recv),
+		})
+	}
+	// Store the updated user state in the database
+	storeUserStateJSON(s.Username, s.State)
+}
+
+func handleFriendRequest(msg ClientMessage, s *UserSession) {
+	log.Println("200: this is a friend request")
+	s.State.PendingFriends = append(s.State.PendingFriends, msg.From)
+	s.History = append(s.History, MessageHistoryEntry{
+		Timestamp: msg.Timestamp,
+		Message:   fmt.Sprintf("Friend request from %s", msg.From),
+	})
+	// Update the recipient's message history
+	recipientSession, ok := GlobalUserSessions[msg.Recv]
+	if ok {
+		recipientSession.State.PendingFriends = append(recipientSession.State.PendingFriends, msg.From)
+		recipientSession.History = append(recipientSession.History, MessageHistoryEntry{
+			Timestamp: msg.Timestamp,
+			Message:   fmt.Sprintf("Friend request from %s", msg.From),
+		})
+	}
+	// Store the request in the database
+	storeUserStateJSON(s.Username, s.State)
 }
 
 func authdSocketMsgWriter(conn *websocket.Conn) {

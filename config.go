@@ -32,31 +32,40 @@ var (
 )
 
 // Packet is an object to encapsulate messages
-// Types: 100 friend request, 200 normal message user to user
 type Packet struct {
 	Type    int    `json:"msg_type"`
 	Content string `json:"msg_content"`
 }
 
+// AuthObject struct represents an object used for authentication purposes. It has two fields: a string Username representing the username of the user, and a string Password representing the password of the user.
 type AuthObject struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+// MessageHistoryEntry struct represents an entry in the message history for a user. It has two fields: an int64 Timestamp representing the time the message was sent or received, and a string Message representing the content of the message.
+type MessageHistoryEntry struct {
+	Timestamp int64  `json:"timestamp"`
+	Message   string `json:"message"`
+}
+
+// UserSession struct represents a session for a user. It has five fields: a string Username representing the username of the user, a ClientStateExchange State representing the current state of the user's client, a pointer to a websocket connection Conn representing the connection to the user's client, a bool Authorized representing whether the user is authorized to use the service, and a slice of MessageHistoryEntry structs History representing the message history for the user.
 type UserSession struct {
-	Username   string              `json:"username"`
-	State      ClientStateExchange `json:"state"`
-	Conn       *websocket.Conn     `json:"conn"`
-	Authorized bool                `json:"authorized"`
+	Username   string                `json:"username"`
+	State      ClientStateExchange   `json:"state"`
+	Conn       *websocket.Conn       `json:"conn"`
+	Authorized bool                  `json:"authorized"`
+	History    []MessageHistoryEntry `json:"history"`
 }
 
 var mutex sync.Mutex
 
 // ClientMessage is a simple format for basic user<->user messages that are passed through a server
 type ClientMessage struct {
-	From string `json:"from"` // alice@server1.tld sending the message
-	Recv string `json:"recv"` // bob@server2.tld receiving the message
-	Body string `json:"body"` // the message body
+	Timestamp int64  `json:"timestamp"`
+	From      string `json:"from"` // alice@server1.tld sending the message
+	Recv      string `json:"recv"` // bob@server2.tld receiving the message
+	Body      string `json:"body"` // the message body
 }
 
 // ClientStateExchange is an interaction with the server that conveys busy status, current friends list, unconfirmed friend requests, blocked users and blocked servers. When a friend request is received from the server, that friend ID is added to the PendingFriends. If it is accepted, the friend ID is added to Friends and removed from PendingFriends, then a ClientStateExchange is sent back to the server to reflect the change. Rejected friend request does not add to BlockedFriends, but the user is presented with accept, reject, block menu.
@@ -82,12 +91,25 @@ type FedMessage struct {
 	RecipientServerURL string    `json:"recipient_server_url"`
 }
 
+// GlobalFedServers is a map of FedServer objects, indexed by the URL of the server.
 var GlobalFedServers = make(map[string]*FedServer)
 
+// FedServer represents a federated server in the messaging system. It has four fields:
+//   - URL is the URL of the server.
+//   - Inbox is a channel for incoming messages for the server.
+//   - Outbox is a channel for outgoing messages from the server.
+//   - Messages is a map of FedMessage objects indexed by their ID.
+//   - Websocket is a pointer to a websocket connection for the server.
 type FedServer struct {
 	URL       string                 `json:"url"`
 	Inbox     chan *FedMessage       `json:"inbox"`
 	Outbox    chan *FedMessage       `json:"outbox"`
 	Messages  map[string]*FedMessage `json:"messages"`
 	Websocket *websocket.Conn        `json:"websocket"`
+}
+
+// FriendRequest struct represents a request to add a user as a friend. It has two fields: a string From representing the username of the sender, and a string To representing the username of the recipient.
+type FriendRequest struct {
+	From string `json:"from"`
+	To   string `json:"to"`
 }

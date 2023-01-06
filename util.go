@@ -25,6 +25,27 @@ func announce(message string) {
 		"\n" + nc + green + "---------------------------------------------\n   " + brightcyan + "+ " + message + green + "\n---------------------------------------------\n\n" + nc)
 }
 
+func storeUserStateJSON(username string, state ClientStateExchange) error {
+	stateJSON, err := json.Marshal(state)
+	if err != nil {
+		return err
+	}
+
+	// Store the JSON in a file named after the username
+	file, err := os.Create("admin/users/" + username + ".state")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(stateJSON)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // fileExists Does this file exist?
 func fileExists(filename string) bool {
 	referencedFile, err := os.Stat(filename)
@@ -164,4 +185,13 @@ func stringExistsInFile(thisString string) bool {
 	}
 
 	return false
+}
+
+func splitAddress(address string) (username, serverURL string) {
+	parts := strings.Split(address, "@")
+	if len(parts) != 2 {
+		log.Printf("Error: invalid address format %s\n", address)
+		return "", ""
+	}
+	return parts[0], parts[1]
 }
