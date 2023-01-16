@@ -209,9 +209,30 @@ func (s *UserSession) Listen() {
 }
 
 func handleChatMessage(msg ClientMessage, s *UserSession) {
+
 	// Split the sender and recipient addresses into their username and server parts
 	_, servertld := splitAddress(msg.From)
 	_, recvServerURL := splitAddress(msg.Recv)
+
+	// Log the values of msg.From and msg.Recv
+	log.Println("msg.From:", msg.From)
+	log.Println("msg.Recv:", msg.Recv)
+
+	// Log the values of servertld and recvServerURL
+	log.Println("servertld:", servertld)
+	log.Println("recvServerURL:", recvServerURL)
+
+	// Log the contents of the GlobalFedServers map
+	log.Println("GlobalFedServers:", GlobalFedServers)
+
+	// Split the sender and recipient addresses into their username and server parts
+	_, splitFrom := splitAddress(msg.From)
+	_, splitTo := splitAddress(msg.Recv)
+
+	// Log the values returned by the splitAddress function
+	log.Println("splitAddress(msg.From):", splitFrom)
+	log.Println("splitAddress(msg.Recv):", splitTo)
+
 	// Check if the recipient is on a different server
 	if recvServerURL != servertld {
 		// Look up the federated server object
@@ -240,44 +261,6 @@ func handleChatMessage(msg ClientMessage, s *UserSession) {
 		go f.Send()
 	}
 }
-
-// func handleChatMessage(msg ClientMessage, s *UserSession) {
-// 	log.Println("300: this is a normal chat message")
-
-// 	// Split the recipient's address into username and server URL
-// 	_, recvServerURL := splitAddress(msg.Recv)
-
-// 	// Check if the recipient is on a different server
-// 	if recvServerURL != fromServerURL {
-// 		// Look up the federated server object
-// 		f, ok := GlobalFedServers[recvServerURL]
-// 		if !ok {
-// 			// If there is not an existing entry in GlobalFedServers for the FedServer receiving this message,
-// 			// we should try and establish a connection with it and add it to GlobalFedServers
-// 			f = &FedServer{
-// 				URL:      recvServerURL,
-// 				Inbox:    make(chan *FedMessage),
-// 				Outbox:   make(chan *FedMessage),
-// 				Messages: make(map[string]*FedMessage),
-// 			}
-// 			err := f.Connect()
-// 			if err != nil {
-// 				log.Println("error connecting to federated server:", err)
-// 				return
-// 			}
-// 			GlobalFedServers[recvServerURL] = f
-// 		}
-// 	}
-
-// 	// Update the recipient's message history
-// 	recipientSession, ok := GlobalUserSessions[msg.Recv]
-// 	if ok {
-// 		recipientSession.History = append(recipientSession.History, MessageHistoryEntry{
-// 			Timestamp: msg.Timestamp,
-// 			Message:   msg.Body,
-// 		})
-// 	}
-// }
 
 func handleFriendDenial(msg ClientMessage, s *UserSession) {
 	log.Println("202: this is a friend denial")
