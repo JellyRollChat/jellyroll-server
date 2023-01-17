@@ -6,9 +6,12 @@ import (
 	"time"
 )
 
+func init() {
+	startTime = time.Now()
+
+}
 func main() {
 
-	startTime = time.Now()
 	osCheck()
 
 	announce("JellyRoll Server")
