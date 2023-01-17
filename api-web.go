@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func WebAPI() {
@@ -34,10 +35,9 @@ func WebAPI() {
 		"OPTIONS",
 	}
 
-	log.Println("API launched")
-
 	http.HandleFunc("/signup", SignupHandlerPOST)
 	http.HandleFunc("/signup/", SignupHandlerPOST)
+	http.HandleFunc("/status", StatusHandlerGET)
 
 	http.ListenAndServe(":"+strconv.Itoa(webPort), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		for _, origin := range corsOrigins {
@@ -103,4 +103,25 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, string(erJSON))
 		return
 	}
+}
+
+func StatusHandlerGET(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only GET requests are allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	uptime := time.Since(startTime)
+	status := struct {
+		Users   int           `json:"users"`
+		Sockets int           `json:"sockets"`
+		Uptime  time.Duration `json:"uptime"`
+	}{
+		userCount,
+		socketCount,
+		uptime,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(status)
 }

@@ -13,7 +13,6 @@ import (
 )
 
 func SocketAPI(keyCollection *ED25519Keys) {
-	announce("Socket API")
 	api := mux.NewRouter()
 	corsAllowedHeaders := []string{
 		"Access-Control-Allow-Headers",

@@ -1,5 +1,0 @@
-where we're at now is we need a way to first get the server to relay a message from user to user.
-
-then we need sign a message 
-
-then the other side needs to verify incoming messages 

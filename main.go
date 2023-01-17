@@ -3,26 +3,35 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"time"
 )
 
 func main() {
 
-	announce("Server up!")
+	startTime = time.Now()
+	osCheck()
+
+	announce("JellyRoll Server")
 
 	createDirIfItDontExist("keys")
 	createDirIfItDontExist("admin")
 	createDirIfItDontExist("admin/users")
 
-	osCheck()
 	serverKeys = initKeys()
 
-	announce("Socket Up!")
+	announce("Sockets Information")
 
-	// open client channel
+	// client comms socket
 	go SocketAPI(serverKeys)
-	fmt.Println("Socket Port:\t" + strconv.Itoa(clientCommPort))
+	fmt.Println("Client Socket Port:\t" + strconv.Itoa(clientCommPort))
 
-	announce("Web Frontend Up!")
+	// server federation comms socket
+	go FederationAPI(serverKeys)
+	fmt.Println("Server Socket Port:\t" + strconv.Itoa(fedCommPort))
+
+	announce("Web API Information")
+
+	// HTTP API
 	go WebAPI()
 	fmt.Println("Web Port:\t" + strconv.Itoa(webPort))
 

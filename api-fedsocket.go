@@ -14,7 +14,6 @@ import (
 
 // FederationAPI is a function that sets up an HTTP server to listen for websocket connections on a specific port, with CORS headers set to allow all origins and methods. When a connection is received, it upgrades the connection to a websocket and passes it to the fedSocketHandler function.
 func FederationAPI(keyCollection *ED25519Keys) {
-	announce("Socket API")
 	api := mux.NewRouter()
 	corsAllowedHeaders := []string{
 		"Access-Control-Allow-Headers",

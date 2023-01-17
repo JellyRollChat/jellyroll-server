@@ -20,6 +20,12 @@ const (
 	selfCertFilePath  = "keys/" + "self.cert"
 )
 
+var (
+	startTime   time.Time
+	userCount   int
+	socketCount int
+)
+
 var serverKeys *ED25519Keys
 
 var GlobalUserSessions = make(map[string]*UserSession)
