@@ -194,3 +194,18 @@ func splitAddress(addr string) (string, string) {
 	}
 	return parts[0], parts[1]
 }
+
+func countLines() int {
+	file, err := os.Open("./admin/users.list")
+	if err != nil {
+		log.Println(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var lines int
+	for scanner.Scan() {
+		lines++
+	}
+	return lines
+}

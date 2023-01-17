@@ -357,12 +357,15 @@ func handleFriendRequest(msg ClientMessage, s *UserSession) {
 func authdSocketMsgWriter(conn *websocket.Conn) {
 
 	for {
+		socketCount++
+		userCount = countLines()
 		defer conn.Close()
+
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Printf(brightyellow+"\n[%s] [%s] Peer disconnected\n"+white, timeStamp(), conn.RemoteAddr())
+			socketCount--
 			log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
-
 			return
 		}
 
