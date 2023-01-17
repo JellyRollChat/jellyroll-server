@@ -13,7 +13,6 @@ import (
 )
 
 func uptime() string {
-	startTime := time.Now() // replace with the actual start time of the server
 	duration := time.Since(startTime)
 	days := int(duration.Hours() / 24)
 	hours := int(duration.Hours()) % 24

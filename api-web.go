@@ -106,7 +106,6 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 
 func StatusHandlerGET(w http.ResponseWriter, r *http.Request) {
 
-	uptime()
 	if r.Method != http.MethodGet {
 		http.Error(w, "Only GET requests are allowed", http.StatusMethodNotAllowed)
 		return
