@@ -24,6 +24,9 @@ func WebAPI() {
 	corsOrigins := []string{
 		"http://127.0.0.1:1430",
 		"http://server.3ck0.com:5270",
+		"https://server.3ck0.com:5270",
+		"http://tracker.jellyroll.chat",
+		"https://tracker.jellyroll.chat",
 	}
 
 	corsMethods := []string{
