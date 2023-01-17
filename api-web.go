@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func WebAPI() {
@@ -106,16 +105,18 @@ func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 }
 
 func StatusHandlerGET(w http.ResponseWriter, r *http.Request) {
+
+	uptime()
 	if r.Method != http.MethodGet {
 		http.Error(w, "Only GET requests are allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	uptime := time.Since(startTime)
+	uptime := uptime()
 	status := struct {
-		Users   int           `json:"users"`
-		Sockets int           `json:"sockets"`
-		Uptime  time.Duration `json:"uptime"`
+		Users   int    `json:"users"`
+		Sockets int    `json:"sockets"`
+		Uptime  string `json:"uptime"`
 	}{
 		userCount,
 		socketCount,

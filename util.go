@@ -12,6 +12,15 @@ import (
 	"time"
 )
 
+func uptime() string {
+	startTime := time.Now() // replace with the actual start time of the server
+	duration := time.Since(startTime)
+	days := int(duration.Hours() / 24)
+	hours := int(duration.Hours()) % 24
+	minutes := int(duration.Minutes()) % 60
+	return fmt.Sprintf("%dd %dh %dm", days, hours, minutes)
+}
+
 func sanitizeString(dirtyString string, maxlen int) string {
 	var re = regexp.MustCompile(`(?i)[^a-z0-9_\.]`)
 	if len(re.ReplaceAllString(dirtyString, "")) > maxlen {
