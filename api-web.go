@@ -114,10 +114,12 @@ func StatusHandlerGET(w http.ResponseWriter, r *http.Request) {
 
 	uptime := uptime()
 	status := struct {
-		Users   int    `json:"users"`
-		Sockets int    `json:"sockets"`
-		Uptime  string `json:"uptime"`
+		ServerURL string `json:"serverurl"`
+		Users     int    `json:"users"`
+		Sockets   int    `json:"sockets"`
+		Uptime    string `json:"uptime"`
 	}{
+		servertld,
 		userCount,
 		socketCount,
 		uptime,
