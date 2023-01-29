@@ -200,7 +200,7 @@ func (s *UserSession) Listen() {
 		case 300:
 			handleChatMessage(msg, s)
 		default:
-			log.Println("???: I didn't understand this message")
+			log.Println("???: undetermined output")
 		}
 
 	}

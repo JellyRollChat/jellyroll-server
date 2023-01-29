@@ -73,7 +73,7 @@ func reportRequest(name string, w http.ResponseWriter, r *http.Request) {
 func SignupHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 	reportRequest("signup", w, r)
