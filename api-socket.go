@@ -78,92 +78,89 @@ func socketHandler(conn *websocket.Conn, keyCollection *ED25519Keys) {
 	conn.WriteJSON(&thisMessage)
 
 }
-
 func loginHandler(msg *Packet, conn *websocket.Conn) {
 	userpass := splitUserPassStr(msg.Content)
-	log.Println("Login username: ", userpass[0])
 	if stringExistsInFile(msg.Content) {
-		thisSession := UserSession{
-			Username:   userpass[0] + "@" + userpass[1],
-			State:      ClientStateExchange{},
-			Conn:       conn,
-			Authorized: true,
-		}
-		if !fileExists("admin/users/" + userpass[0] + ".state") {
-			createFile("admin/users/" + userpass[0] + ".state")
-			thisSession.State = ClientStateExchange{
-				CurrentFriends: []string{
-					"esp@server.3ck0.com",
-					"fred@server.3ck0.com",
-				},
-				PendingFriends: []string{
-					"wanda@cool.yachts",
-					"mark@white.monster",
-				},
-				BlockedFriends: []string{},
-				BlockedServers: []string{},
-			}
-			for _, r := range thisSession.State.CurrentFriends {
-				log.Println("Online? ", r)
-				for _, rr := range GlobalUserSessions {
-					log.Println("Checking: ", rr)
-					if rr.Username == r {
-						r = "(" + r + ")"
-						log.Println("Match found! ", r)
-					}
-				}
-			}
-			marshalState, msErr := json.Marshal(thisSession.State)
-			if msErr != nil {
-				log.Println("Marshal Error: " + msErr.Error())
-				conn.WriteMessage(1, []byte("Marshal Error"))
-				conn.Close()
-				return
-			}
-			writeFile("admin/users/"+userpass[0]+".state", string(marshalState))
-			// thisFile := readFile("admin/users/" + userpass[0] + ".state")
-			// log.Println("This user's state: " + thisFile)
-			conn.WriteJSON(marshalState)
-			// log.Println("User state created: " + "admin/users/" + userpass[0] + ".state")
-
-		} else if stringExistsInFile(msg.Content) {
-			// log.Println("User state exists: " + "admin/users/" + userpass[0] + ".state")
-
-			thisFile := readFile("admin/users/" + userpass[0] + ".state")
-			unmarshErr := json.Unmarshal([]byte(thisFile), &thisSession.State)
-			for _, r := range thisSession.State.CurrentFriends {
-				log.Println("Online? ", r)
-				for _, rr := range GlobalUserSessions {
-					log.Println("Checking: ", rr)
-					if rr.Username == r {
-						r = "(" + r + ")"
-						log.Println("Match found! ", r)
-					}
-				}
-			}
-			if unmarshErr != nil {
-				log.Println("Unmarshal error: " + unmarshErr.Error())
-			}
-
-			conn.WriteMessage(1, []byte(thisFile))
-		}
-		// log.Println(msg.Content)
-		// log.Println("User exists in user list")
-		AddUserSession(&thisSession)
-		log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
-		log.Println("Users online: ")
-		for i, session := range GlobalUserSessions {
-			fmt.Printf(i + " " + session.Username + " ")
-		}
-
-		// authdSocketMsgWriter(conn)
+		handleSuccessfulLogin(userpass, conn, msg)
 	} else {
-		log.Println("User does not exist in user list")
-		conn.WriteMessage(1, []byte("Access Denied. Goodbye!"))
 		conn.Close()
 	}
-
 }
+
+// func loginHandler(msg *Packet, conn *websocket.Conn) {
+// 	userpass := splitUserPassStr(msg.Content)
+// 	log.Println("Login username: ", userpass[0])
+// 	if stringExistsInFile(msg.Content) {
+// 		thisSession := UserSession{
+// 			Username:   userpass[0] + "@" + userpass[1],
+// 			State:      ClientStateExchange{},
+// 			Conn:       conn,
+// 			Authorized: true,
+// 		}
+// 		if !fileExists("admin/users/" + userpass[0] + ".state") {
+// 			createFile("admin/users/" + userpass[0] + ".state")
+// 			thisSession.State = ClientStateExchange{
+// 				CurrentFriends: []string{
+// 					"esp@server.3ck0.com",
+// 					"fred@server.3ck0.com",
+// 				},
+// 				PendingFriends: []string{
+// 					"wanda@cool.yachts",
+// 					"mark@white.monster",
+// 				},
+// 				BlockedFriends: []string{},
+// 				BlockedServers: []string{},
+// 			}
+// 			for _, r := range thisSession.State.CurrentFriends {
+// 				log.Println("Online? ", r)
+// 				for _, rr := range GlobalUserSessions {
+// 					log.Println("Checking: ", rr)
+// 					if rr.Username == r {
+// 						r = "(" + r + ")"
+// 						log.Println("Match found! ", r)
+// 					}
+// 				}
+// 			}
+// 			marshalState, msErr := json.Marshal(thisSession.State)
+// 			if msErr != nil {
+// 				log.Println("Marshal Error: " + msErr.Error())
+// 				conn.WriteMessage(1, []byte("Marshal Error"))
+// 				conn.Close()
+// 				return
+// 			}
+// 			writeFile("admin/users/"+userpass[0]+".state", string(marshalState))
+// 			conn.WriteJSON(marshalState)
+// 		} else if stringExistsInFile(msg.Content) {
+// 			thisFile := readFile("admin/users/" + userpass[0] + ".state")
+// 			unmarshErr := json.Unmarshal([]byte(thisFile), &thisSession.State)
+// 			for _, r := range thisSession.State.CurrentFriends {
+// 				log.Println("Online? ", r)
+// 				for _, rr := range GlobalUserSessions {
+// 					log.Println("Checking: ", rr)
+// 					if rr.Username == r {
+// 						r = "(" + r + ")"
+// 						log.Println("Match found! ", r)
+// 					}
+// 				}
+// 			}
+// 			if unmarshErr != nil {
+// 				log.Println("Unmarshal error: " + unmarshErr.Error())
+// 			}
+// 			conn.WriteMessage(1, []byte(thisFile))
+// 		}
+// 		AddUserSession(&thisSession)
+// 		log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
+// 		log.Println("Users online: ")
+// 		for i, session := range GlobalUserSessions {
+// 			fmt.Printf(i + " " + session.Username + " ")
+// 		}
+// 		authdSocketMsgWriter(conn)
+// 	} else {
+// 		log.Println("User does not exist in user list")
+// 		conn.WriteMessage(1, []byte("Access Denied. Goodbye!"))
+// 		conn.Close()
+// 	}
+// }
 
 func (s *UserSession) Listen() {
 	mutex.Lock()
@@ -354,44 +351,93 @@ func handleFriendRequest(msg ClientMessage, s *UserSession) {
 	storeUserStateJSON(s.Username, s.State)
 }
 
-func authdSocketMsgWriter(conn *websocket.Conn) {
+// func authdSocketMsgWriter(conn *websocket.Conn) {
+// 	for {
+// 		socketCount++
+// 		userCount = countLines()
+// 		defer conn.Close()
+// 		_, msg, err := conn.ReadMessage()
+// 		if err != nil {
+// 			fmt.Printf(brightyellow+"\n[%s] [%s] Peer disconnected\n"+white, timeStamp(), conn.RemoteAddr())
+// 			socketCount--
+// 			log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
+// 			return
+// 		}
+// 		thisPacket := Packet{}
+// 		unmarshalError := json.Unmarshal(msg, &thisPacket)
+// 		if unmarshalError != nil {
+// 			log.Println("unmarshal error", unmarshalError)
+// 		}
+// 		if thisPacket.Type == 100 {
+// 			log.Println("100: User is already logged in.")
+// 			conn.WriteMessage(1, []byte("You are already logged in."))
+// 		} else if thisPacket.Type == 200 {
+// 			log.Println("200: this is a friend request")
+// 			conn.WriteMessage(1, []byte("friend request"))
+// 		} else if thisPacket.Type == 300 {
+// 			log.Println("300: this is a normal chat message")
+// 			conn.WriteMessage(1, []byte("chat message"))
+// 		} else {
+// 			log.Println("???: I didn't understand this message")
+// 			conn.WriteMessage(1, []byte("didn't understand this request"))
+// 		}
+// 	}
 
-	for {
-		socketCount++
-		userCount = countLines()
-		defer conn.Close()
+// }
 
-		_, msg, err := conn.ReadMessage()
-		if err != nil {
-			fmt.Printf(brightyellow+"\n[%s] [%s] Peer disconnected\n"+white, timeStamp(), conn.RemoteAddr())
-			socketCount--
-			log.Println(brightcyan+"Global Socket Sessions: ", len(GlobalUserSessions))
+func handleSuccessfulLogin(userpass []string, conn *websocket.Conn, msg *Packet) {
+	username := userpass[0] + "@" + userpass[1]
+	thisSession := UserSession{
+		Username:   username,
+		State:      ClientStateExchange{},
+		Conn:       conn,
+		Authorized: true,
+	}
+	if !fileExists("admin/users/" + userpass[0] + ".state") {
+		createFile("admin/users/" + userpass[0] + ".state")
+		thisSession.State = ClientStateExchange{
+			CurrentFriends: []string{
+				"fred@server.3ck0.com",
+			},
+			PendingFriends: []string{
+				"mark@white.monster",
+			},
+			BlockedFriends: []string{},
+			BlockedServers: []string{},
+		}
+		for _, r := range thisSession.State.CurrentFriends {
+			for _, rr := range GlobalUserSessions {
+				if rr.Username == r {
+					r = "(" + r + ")"
+				}
+			}
+		}
+		marshalState, msErr := json.Marshal(thisSession.State)
+		if msErr != nil {
+			conn.Close()
 			return
 		}
-
-		thisPacket := Packet{}
-
-		unmarshalError := json.Unmarshal(msg, &thisPacket)
-		if unmarshalError != nil {
-			log.Println("unmarshal error", unmarshalError)
+		writeFile("admin/users/"+userpass[0]+".state", string(marshalState))
+		conn.WriteJSON(marshalState)
+	} else if stringExistsInFile(msg.Content) {
+		thisFile := readFile("admin/users/" + userpass[0] + ".state")
+		unmarshErr := json.Unmarshal([]byte(thisFile), &thisSession.State)
+		for _, r := range thisSession.State.CurrentFriends {
+			for _, rr := range GlobalUserSessions {
+				if rr.Username == r {
+					r = "(" + r + ")"
+				}
+			}
 		}
-
-		if thisPacket.Type == 100 {
-			log.Println("100: User is already logged in.")
-			conn.WriteMessage(1, []byte("You are already logged in."))
-		} else if thisPacket.Type == 200 {
-			log.Println("200: this is a friend request")
-			conn.WriteMessage(1, []byte("friend request"))
-		} else if thisPacket.Type == 300 {
-			log.Println("300: this is a normal chat message")
-			conn.WriteMessage(1, []byte("chat message"))
-		} else {
-			log.Println("???: I didn't understand this message")
-			conn.WriteMessage(1, []byte("didn't understand this request"))
+		if unmarshErr != nil {
+			log.Println("Unmarshal error: " + unmarshErr.Error())
 		}
-
+		conn.WriteMessage(1, []byte(thisFile))
 	}
-
+	AddUserSession(&thisSession)
+	for i, session := range GlobalUserSessions {
+		fmt.Printf(i + " " + session.Username + " ")
+	}
 }
 
 // AddUserSession adds a new user session to the global map
