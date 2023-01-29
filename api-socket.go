@@ -156,7 +156,7 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 			fmt.Printf(i + " " + session.Username + " ")
 		}
 
-		authdSocketMsgWriter(conn)
+		// authdSocketMsgWriter(conn)
 	} else {
 		log.Println("User does not exist in user list")
 		conn.WriteMessage(1, []byte("Access Denied. Goodbye!"))
@@ -200,7 +200,7 @@ func (s *UserSession) Listen() {
 		case 300:
 			handleChatMessage(msg, s)
 		default:
-			log.Println("???: undetermined output")
+			log.Println("???: unhandled output")
 		}
 
 	}
