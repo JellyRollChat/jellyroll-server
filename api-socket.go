@@ -78,6 +78,7 @@ func loginHandler(msg *Packet, conn *websocket.Conn) {
 	if stringExistsInFile(msg.Content) {
 		handleSuccessfulLogin(userpass, conn, msg)
 	} else {
+		log.Println("We have prbolems")
 		conn.WriteMessage(1, []byte("uhoh"))
 		conn.Close()
 	}
